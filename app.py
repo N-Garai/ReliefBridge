@@ -133,24 +133,26 @@ def login():
 
     return render_template('login.html')
 
+
 @app.route('/oauth/google')
 def google_oauth():
     """Google OAuth login"""
     try:
-        # Create OAuth URL for Google
         success_url = url_for('oauth_callback', _external=True)
         failure_url = url_for('login', _external=True)
-
-        oauth_url = account.create_o_auth2_session(
+        
+        # NEW METHOD NAME: create_oauth2_session (no underscore between o and auth)
+        oauth_url = account.create_oauth2_session(
             provider='google',
             success=success_url,
             failure=failure_url
         )
-
+        
         return redirect(oauth_url)
-    except AppwriteException as e:
-        flash(f'Google login failed: {e.message}', 'danger')
+    except Exception as e:
+        flash(f'Google login failed: {str(e)}', 'danger')
         return redirect(url_for('login'))
+
 
 @app.route('/oauth/callback')
 def oauth_callback():
