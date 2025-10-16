@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid my-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-map-fill"></i> Emergency Response Map</h2>
+            <p class="text-muted">Real-time view of all help requests and their locations</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    <div id="map" style="height: 600px; border-radius: 8px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Request List</h5>
+                </div>
+                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    {% for req in requests %}
+                    <div class="card mb-2 border-{{ 'danger' if req.priority == 'high' else 'warning' if req.priority == 'medium' else 'secondary' }}">
+                        <div class="card-body py-2">
+                            <h6 class="card-title mb-1">
+                                <span class="badge bg-info">{{ req.request_type }}</span>
+                                {% if req.priority == 'high' %}
+                                    <span class="badge bg-danger">URGENT</span>
+                                {% endif %}
+                            </h6>
+                            <small class="text-muted">
+                                <i class="bi bi-geo-alt"></i> {{ req.location }}<br>
+                                <i class="bi bi-person"></i> {{ req.user_name }}<br>
+                                <i class="bi bi-clock"></i> {{ req.created_at[:10] }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize map
+var map = L.map('map').setView([40.7128, -74.0060], 10);
+
+// Add tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// Add markers for requests
+var requests = {{ requests | tojsonfilter }};
+requests.forEach(function(req) {
+    var color = req.priority === 'high' ? 'red' : req.priority === 'medium' ? 'orange' : 'green';
+    var icon = L.divIcon({
+        className: 'custom-div-icon',
+        html: `<div style="background-color: ${color}; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white;"></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+    });
+
+    var marker = L.marker([req.latitude, req.longitude], {icon: icon}).addTo(map);
+    marker.bindPopup(`
+        <strong>${req.request_type.toUpperCase()}</strong><br>
+        ${req.description.substring(0, 100)}...<br>
+        <small><strong>Priority:</strong> ${req.priority}<br>
+        <strong>Status:</strong> ${req.status}<br>
+        <strong>Contact:</strong> ${req.contact_phone}</small>
+    `);
+});
+
+// Fit map to show all markers
+if (requests.length > 0) {
+    var group = new L.featureGroup(map._layers);
+    map.fitBounds(group.getBounds().pad(0.1));
+}
+</script>
+{% endblock %}

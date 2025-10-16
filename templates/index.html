@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-primary text-white py-5">
+    <div class="container text-center py-5">
+        <h1 class="display-3 fw-bold mb-4">
+            <i class="bi bi-heart-pulse-fill"></i> ReliefBridge
+        </h1>
+        <p class="lead mb-4">Connecting Disaster Victims, Volunteers, and Relief Organizations in Real-Time</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-5">
+                Get Started
+            </a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-5">
+                Login
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <h2 class="text-center mb-5">How ReliefBridge Works</h2>
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="card h-100 text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="feature-icon bg-primary text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title">Report Emergency</h5>
+                    <p class="card-text">Victims can quickly report their needs for food, medical aid, or shelter with location details.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="feature-icon bg-success text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-people-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title">Volunteer Response</h5>
+                    <p class="card-text">Volunteers can view requests and claim tasks to provide immediate assistance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="feature-icon bg-info text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-lightning-charge-fill fs-2"></i>
+                    </div>
+                    <h5 class="card-title">Real-Time Updates</h5>
+                    <p class="card-text">Live notifications and updates ensure everyone stays informed about changing situations.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card h-100 text-center border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="feature-icon bg-warning text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-graph-up-arrow fs-2"></i>
+                    </div>
+                    <h5 class="card-title">Resource Tracking</h5>
+                    <p class="card-text">NGOs and coordinators can track resource distribution and optimize relief efforts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Section -->
+<div class="bg-light py-5 my-5">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <h2 class="display-4 text-primary fw-bold">500+</h2>
+                <p class="lead">Lives Helped</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4 text-success fw-bold">200+</h2>
+                <p class="lead">Active Volunteers</p>
+            </div>
+            <div class="col-md-4">
+                <h2 class="display-4 text-info fw-bold">50+</h2>
+                <p class="lead">Partner NGOs</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="container text-center my-5 py-5">
+    <h2 class="mb-4">Ready to Make a Difference?</h2>
+    <p class="lead mb-4">Join ReliefBridge today and help save lives during disasters.</p>
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">
+        Register Now
+    </a>
+</div>
+{% endblock %}

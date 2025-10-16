@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h2><i class="bi bi-people-fill"></i> Volunteer Dashboard</h2>
+            <p class="text-muted">Find and claim help requests to assist disaster victims</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Available Requests -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-search"></i> Available Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if available_requests %}
+                        {% for req in available_requests %}
+                        <div class="card mb-3 border-{{ 'danger' if req.priority == 'high' else 'warning' if req.priority == 'medium' else 'secondary' }}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="card-title">
+                                            <span class="badge bg-info">{{ req.request_type }}</span>
+                                            {% if req.priority == 'high' %}
+                                                <span class="badge bg-danger">URGENT</span>
+                                            {% endif %}
+                                        </h6>
+                                        <p class="card-text">{{ req.description[:100] }}...</p>
+                                        <small class="text-muted">
+                                            <i class="bi bi-geo-alt"></i> {{ req.location }}
+                                            <br>
+                                            <i class="bi bi-person"></i> {{ req.user_name }}
+                                            <br>
+                                            <i class="bi bi-telephone"></i> {{ req.contact_phone }}
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <form method="POST" action="{{ url_for('claim_request', request_id=req['$id']) }}">
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="bi bi-hand-thumbs-up"></i> Claim
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-check-circle display-1 text-success"></i>
+                            <p class="lead mt-3">No requests available right now.</p>
+                            <p>Check back later for new requests.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- My Claimed Requests -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-check"></i> My Claimed Requests</h5>
+                </div>
+                <div class="card-body">
+                    {% if my_requests %}
+                        {% for req in my_requests %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    <span class="badge bg-info">{{ req.request_type }}</span>
+                                    {% if req.status == 'in_progress' %}
+                                        <span class="badge bg-warning">In Progress</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Completed</span>
+                                    {% endif %}
+                                </h6>
+                                <p class="card-text">{{ req.description[:80] }}...</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-geo-alt"></i> {{ req.location }}
+                                    <br>
+                                    <i class="bi bi-person"></i> {{ req.user_name }}
+                                </small>
+                                {% if req.status == 'in_progress' %}
+                                <div class="mt-2">
+                                    <button class="btn btn-success btn-sm" onclick="markComplete('{{ req['$id'] }}')">
+                                        <i class="bi bi-check-circle"></i> Mark Complete
+                                    </button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="text-center py-4">
+                            <i class="bi bi-clipboard display-1 text-muted"></i>
+                            <p class="lead mt-3">No claimed requests yet.</p>
+                            <p>Claim requests from the available list to get started.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function markComplete(requestId) {
+    if (confirm('Are you sure you want to mark this request as completed?')) {
+        fetch(`/request/${requestId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(() => {
+            location.reload();
+        });
+    }
+}
+</script>
+{% endblock %}
