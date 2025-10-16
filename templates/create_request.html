@@ -1,71 +1,137 @@
 {% extends "base.html" %}
 
+{% block title %}Request Help - ReliefBridge{% endblock %}
+
 {% block content %}
 <div class="container my-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0"><i class="bi bi-exclamation-triangle-fill"></i> Request Help</h4>
+        <div class="col-lg-8">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-danger text-white text-center py-4 rounded-top-4">
+                    <div class="mb-3">
+                        <i class="bi bi-exclamation-triangle-fill display-4"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2">Request Emergency Help</h3>
+                    <p class="mb-0 opacity-75">Get connected with volunteers and organizations in your area</p>
                 </div>
-                <div class="card-body p-4">
-                    <form method="POST" action="{{ url_for('create_request') }}" id="requestForm">
-                        <div class="mb-3">
-                            <label for="request_type" class="form-label">Type of Help Needed</label>
-                            <select class="form-select" id="request_type" name="request_type" required>
-                                <option value="">Select type...</option>
-                                <option value="food">Food & Water</option>
-                                <option value="medical">Medical Aid</option>
-                                <option value="shelter">Shelter</option>
-                                <option value="rescue">Rescue Operation</option>
-                                <option value="transport">Transportation</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
 
-                        <div class="mb-3">
-                            <label for="priority" class="form-label">Priority Level</label>
-                            <select class="form-select" id="priority" name="priority" required>
-                                <option value="high">High (Urgent)</option>
-                                <option value="medium">Medium</option>
-                                <option value="low">Low</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" rows="4" required placeholder="Describe your situation and what help you need..."></textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="location" class="form-label">Location Address</label>
-                            <input type="text" class="form-control" id="location" name="location" required placeholder="Enter your location">
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="latitude" class="form-label">Latitude</label>
-                                <input type="number" step="any" class="form-control" id="latitude" name="latitude" required>
+                <div class="card-body p-5">
+                    <!-- Emergency Alert -->
+                    <div class="alert alert-warning border-0 rounded-3 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <strong>Life-threatening emergency?</strong><br>
+                                <small>If you're in immediate danger, call 911 first, then create your request here for additional support.</small>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="longitude" class="form-label">Longitude</label>
-                                <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
+                            <a href="tel:911" class="btn btn-danger ms-auto">
+                                <i class="bi bi-telephone-fill me-1"></i>911
+                            </a>
+                        </div>
+                    </div>
+
+                    <form method="POST" action="{{ url_for('create_request') }}" class="needs-validation" novalidate id="requestForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="request_type" class="form-label fw-semibold">
+                                    <i class="bi bi-tag me-2"></i>Type of Help Needed
+                                </label>
+                                <select class="form-select form-select-lg" id="request_type" name="request_type" required>
+                                    <option value="">Select type...</option>
+                                    <option value="food">🍲 Food & Water</option>
+                                    <option value="medical">🩺 Medical Aid</option>
+                                    <option value="shelter">🏠 Shelter</option>
+                                    <option value="rescue">🚨 Rescue Operation</option>
+                                    <option value="transport">🚗 Transportation</option>
+                                    <option value="other">📋 Other</option>
+                                </select>
+                                <div class="invalid-feedback">Please select the type of help you need.</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label fw-semibold">
+                                    <i class="bi bi-speedometer me-2"></i>Priority Level
+                                </label>
+                                <select class="form-select form-select-lg" id="priority" name="priority" required>
+                                    <option value="high">🔴 High (Urgent - Life threatening)</option>
+                                    <option value="medium">🟡 Medium (Important)</option>
+                                    <option value="low">🟢 Low (When possible)</option>
+                                </select>
+                                <div class="invalid-feedback">Please select the priority level.</div>
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-info mb-3" onclick="getLocation()">
-                            <i class="bi bi-geo-alt-fill"></i> Get My Current Location
-                        </button>
-
-                        <div class="mb-3">
-                            <label for="contact_phone" class="form-label">Contact Phone</label>
-                            <input type="tel" class="form-control" id="contact_phone" name="contact_phone" required>
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold">
+                                <i class="bi bi-chat-text me-2"></i>Detailed Description
+                            </label>
+                            <textarea class="form-control" id="description" name="description" rows="4" required 
+                                      placeholder="Please provide detailed information about your situation and exactly what help you need. Include any relevant details about your condition, resources needed, or special requirements..."></textarea>
+                            <div class="form-text">
+                                <small>Be as specific as possible to help volunteers understand how to assist you</small>
+                            </div>
+                            <div class="invalid-feedback">Please describe your situation and what help you need.</div>
                         </div>
 
-                        <button type="submit" class="btn btn-danger w-100 py-2">
-                            <i class="bi bi-send-fill"></i> Submit Help Request
-                        </button>
+                        <div class="mb-4">
+                            <label for="location" class="form-label fw-semibold">
+                                <i class="bi bi-geo-alt me-2"></i>Your Location
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="location" name="location" required 
+                                   placeholder="Enter your full address or nearest landmark">
+                            <div class="form-text">
+                                <small>Provide the most accurate location possible for volunteers to find you</small>
+                            </div>
+                            <div class="invalid-feedback">Please provide your location.</div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="latitude" class="form-label fw-semibold">Latitude</label>
+                                <input type="number" step="any" class="form-control" id="latitude" name="latitude" required readonly>
+                                <div class="invalid-feedback">Location coordinates are required.</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="longitude" class="form-label fw-semibold">Longitude</label>
+                                <input type="number" step="any" class="form-control" id="longitude" name="longitude" required readonly>
+                                <div class="invalid-feedback">Location coordinates are required.</div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mb-4">
+                            <button type="button" class="btn btn-info btn-lg px-5" onclick="getLocation()">
+                                <i class="bi bi-geo-alt-fill me-2"></i>Get My Current Location
+                            </button>
+                            <div class="form-text mt-2">
+                                <small>Click to automatically fill in your GPS coordinates</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="contact_phone" class="form-label fw-semibold">
+                                <i class="bi bi-telephone me-2"></i>Contact Phone Number
+                            </label>
+                            <input type="tel" class="form-control form-control-lg" id="contact_phone" name="contact_phone" required 
+                                   placeholder="+1 (555) 123-4567">
+                            <div class="form-text">
+                                <small>This number will be shared with volunteers who claim your request</small>
+                            </div>
+                            <div class="invalid-feedback">Please provide a contact phone number.</div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger btn-lg py-3 fw-semibold">
+                                <i class="bi bi-send-fill me-2"></i>Submit Help Request
+                            </button>
+                        </div>
                     </form>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3 rounded-bottom-4">
+                    <small class="text-muted">
+                        <i class="bi bi-shield-check text-success me-1"></i>
+                        Your request will be visible to verified volunteers and organizations in your area
+                    </small>
                 </div>
             </div>
         </div>
@@ -73,34 +139,130 @@
 </div>
 
 <script>
+let locationObtained = false;
+
 function getLocation() {
+    const button = event.target;
+    const originalText = button.innerHTML;
+
+    button.innerHTML = '<i class="bi bi-spinner spinner-border spinner-border-sm me-2"></i>Getting Location...';
+    button.disabled = true;
+
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(showPosition, showError, {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 300000
+        });
     } else {
-        alert("Geolocation is not supported by this browser.");
+        showError({ code: 0, message: "Geolocation is not supported by this browser." });
+    }
+
+    function showPosition(position) {
+        document.getElementById('latitude').value = position.coords.latitude;
+        document.getElementById('longitude').value = position.coords.longitude;
+        locationObtained = true;
+
+        button.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Location Obtained';
+        button.classList.remove('btn-info');
+        button.classList.add('btn-success');
+
+        // Try to get address from coordinates
+        if (navigator.geolocation) {
+            reverseGeocode(position.coords.latitude, position.coords.longitude);
+        }
+    }
+
+    function showError(error) {
+        let message = "Unable to get location: ";
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                message += "Permission denied. Please allow location access.";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                message += "Location information unavailable.";
+                break;
+            case error.TIMEOUT:
+                message += "Location request timed out.";
+                break;
+            default:
+                message += "An unknown error occurred.";
+                break;
+        }
+
+        alert(message);
+        button.innerHTML = originalText;
+        button.disabled = false;
     }
 }
 
-function showPosition(position) {
-    document.getElementById('latitude').value = position.coords.latitude;
-    document.getElementById('longitude').value = position.coords.longitude;
-}
-
-function showError(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            alert("User denied the request for Geolocation.");
-            break;
-        case error.POSITION_UNAVAILABLE:
-            alert("Location information is unavailable.");
-            break;
-        case error.TIMEOUT:
-            alert("The request to get user location timed out.");
-            break;
-        case error.UNKNOWN_ERROR:
-            alert("An unknown error occurred.");
-            break;
+function reverseGeocode(lat, lng) {
+    // This would typically use a geocoding service
+    // For demo purposes, we'll just suggest they manually enter the address
+    const locationField = document.getElementById('location');
+    if (!locationField.value) {
+        locationField.placeholder = `Location obtained (${lat.toFixed(4)}, ${lng.toFixed(4)}) - Please enter your address`;
+        locationField.focus();
     }
 }
+
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!locationObtained) {
+                    alert('Please click "Get My Current Location" to set your GPS coordinates before submitting.');
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
+
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Auto-save form data
+const form = document.getElementById('requestForm');
+const formElements = form.querySelectorAll('input, select, textarea');
+
+formElements.forEach(element => {
+    element.addEventListener('input', () => {
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        localStorage.setItem('reliefbridge_request_draft', JSON.stringify(data));
+    });
+});
+
+// Load saved data
+window.addEventListener('load', () => {
+    const savedData = localStorage.getItem('reliefbridge_request_draft');
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            Object.keys(data).forEach(key => {
+                const field = form.querySelector(`[name="${key}"]`);
+                if (field && data[key]) {
+                    field.value = data[key];
+                }
+            });
+        } catch (e) {
+            console.warn('Error loading saved form data');
+        }
+    }
+});
+
+// Clear saved data on successful submit
+form.addEventListener('submit', () => {
+    localStorage.removeItem('reliefbridge_request_draft');
+});
 </script>
 {% endblock %}

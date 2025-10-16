@@ -1,101 +1,287 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero-section bg-primary text-white py-5">
-    <div class="container text-center py-5">
-        <h1 class="display-3 fw-bold mb-4">
-            <i class="bi bi-heart-pulse-fill"></i> ReliefBridge
-        </h1>
-        <p class="lead mb-4">Connecting Disaster Victims, Volunteers, and Relief Organizations in Real-Time</p>
-        <div class="d-flex justify-content-center gap-3">
-            <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-5">
-                Get Started
-            </a>
-            <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-5">
-                Login
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- Features Section -->
-<div class="container my-5">
-    <h2 class="text-center mb-5">How ReliefBridge Works</h2>
-    <div class="row g-4">
-        <div class="col-md-3">
-            <div class="card h-100 text-center border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="feature-icon bg-primary text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+<!-- Professional Hero Section -->
+<section class="hero-section bg-gradient-primary text-white position-relative overflow-hidden">
+    <div class="hero-background"></div>
+    <div class="container py-5 position-relative">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6 mb-5 mb-lg-0">
+                <div class="hero-content">
+                    <h1 class="display-3 fw-bold mb-4 animate-fade-in">
+                        Professional Disaster Relief
+                        <span class="text-warning">Coordination</span>
+                    </h1>
+                    <p class="lead mb-4 fs-5 animate-fade-in-delay">
+                        Connect disaster victims, volunteers, and relief organizations in real-time with our professional-grade coordination platform.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 animate-fade-in-delay-2">
+                        <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-5 py-3 text-primary fw-semibold">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Get Started Free
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-5 py-3">
+                            <i class="bi bi-play-circle me-2"></i>Learn More
+                        </a>
                     </div>
-                    <h5 class="card-title">Report Emergency</h5>
-                    <p class="card-text">Victims can quickly report their needs for food, medical aid, or shelter with location details.</p>
+                    <div class="hero-stats mt-5">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="fw-bold mb-0">500+</h3>
+                                    <small class="text-white-75">Lives Helped</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="fw-bold mb-0">200+</h3>
+                                    <small class="text-white-75">Active Volunteers</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="stat-item">
+                                    <h3 class="fw-bold mb-0">50+</h3>
+                                    <small class="text-white-75">Partner NGOs</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100 text-center border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="feature-icon bg-success text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-people-fill fs-2"></i>
+            <div class="col-lg-6">
+                <div class="hero-image text-center">
+                    <div class="hero-card bg-white bg-opacity-10 backdrop-blur rounded-4 p-4 mb-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="status-indicator bg-success rounded-circle me-3"></div>
+                                <div>
+                                    <h6 class="mb-0 text-white fw-semibold">Emergency Request</h6>
+                                    <small class="text-white-75">Food assistance needed</small>
+                                </div>
+                            </div>
+                            <span class="badge bg-danger">URGENT</span>
+                        </div>
                     </div>
-                    <h5 class="card-title">Volunteer Response</h5>
-                    <p class="card-text">Volunteers can view requests and claim tasks to provide immediate assistance.</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100 text-center border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="feature-icon bg-info text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-lightning-charge-fill fs-2"></i>
+                    <div class="hero-card bg-white bg-opacity-10 backdrop-blur rounded-4 p-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <div class="status-indicator bg-warning rounded-circle me-3"></div>
+                                <div>
+                                    <h6 class="mb-0 text-white fw-semibold">Volunteer Response</h6>
+                                    <small class="text-white-75">3 volunteers en route</small>
+                                </div>
+                            </div>
+                            <i class="bi bi-people-fill text-white fs-4"></i>
+                        </div>
                     </div>
-                    <h5 class="card-title">Real-Time Updates</h5>
-                    <p class="card-text">Live notifications and updates ensure everyone stays informed about changing situations.</p>
                 </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card h-100 text-center border-0 shadow-sm">
-                <div class="card-body">
-                    <div class="feature-icon bg-warning text-white rounded-circle mx-auto mb-3" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;">
-                        <i class="bi bi-graph-up-arrow fs-2"></i>
-                    </div>
-                    <h5 class="card-title">Resource Tracking</h5>
-                    <p class="card-text">NGOs and coordinators can track resource distribution and optimize relief efforts.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Statistics Section -->
-<div class="bg-light py-5 my-5">
-    <div class="container">
-        <div class="row text-center">
-            <div class="col-md-4">
-                <h2 class="display-4 text-primary fw-bold">500+</h2>
-                <p class="lead">Lives Helped</p>
-            </div>
-            <div class="col-md-4">
-                <h2 class="display-4 text-success fw-bold">200+</h2>
-                <p class="lead">Active Volunteers</p>
-            </div>
-            <div class="col-md-4">
-                <h2 class="display-4 text-info fw-bold">50+</h2>
-                <p class="lead">Partner NGOs</p>
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- CTA Section -->
-<div class="container text-center my-5 py-5">
-    <h2 class="mb-4">Ready to Make a Difference?</h2>
-    <p class="lead mb-4">Join ReliefBridge today and help save lives during disasters.</p>
-    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">
-        Register Now
-    </a>
-</div>
+<!-- Professional Features Section -->
+<section id="features" class="py-5 bg-white">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold mb-3">How ReliefBridge Works</h2>
+            <p class="lead text-muted">Professional disaster relief coordination in four simple steps</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border-0 shadow-sm rounded-4 bg-white position-relative">
+                    <div class="feature-icon bg-gradient-danger text-white rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-exclamation-triangle-fill fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Report Emergency</h5>
+                    <p class="text-muted">Victims can quickly report their needs for food, medical aid, or shelter with precise location details and priority levels.</p>
+                    <div class="feature-number">01</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border-0 shadow-sm rounded-4 bg-white position-relative">
+                    <div class="feature-icon bg-gradient-success text-white rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-people-fill fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Volunteer Response</h5>
+                    <p class="text-muted">Trained volunteers can view, claim, and respond to requests based on their location, skills, and availability.</p>
+                    <div class="feature-number">02</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border-0 shadow-sm rounded-4 bg-white position-relative">
+                    <div class="feature-icon bg-gradient-info text-white rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-lightning-charge-fill fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Real-Time Updates</h5>
+                    <p class="text-muted">Live notifications, status updates, and location tracking ensure everyone stays informed about changing situations.</p>
+                    <div class="feature-number">03</div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="feature-card h-100 text-center p-4 border-0 shadow-sm rounded-4 bg-white position-relative">
+                    <div class="feature-icon bg-gradient-warning text-white rounded-circle mx-auto mb-4 d-flex align-items-center justify-content-center">
+                        <i class="bi bi-graph-up-arrow fs-1"></i>
+                    </div>
+                    <h5 class="fw-bold mb-3">Resource Tracking</h5>
+                    <p class="text-muted">NGOs and coordinators can track resource distribution, optimize relief efforts, and generate impact reports.</p>
+                    <div class="feature-number">04</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Professional CTA Section -->
+<section class="py-5 bg-light">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mb-4 mb-lg-0">
+                <h2 class="display-6 fw-bold mb-3">Ready to Make a Real Impact?</h2>
+                <p class="lead text-muted mb-0">Join thousands of volunteers, victims, and organizations using ReliefBridge to coordinate disaster relief efforts worldwide.</p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5 py-3 fw-semibold">
+                    <i class="bi bi-rocket-takeoff me-2"></i>Start Helping Today
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Professional Trust Section -->
+<section class="py-5 bg-white">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h3 class="fw-bold mb-3">Trusted by Leading Organizations</h3>
+            <p class="text-muted">Professional disaster relief coordination you can rely on</p>
+        </div>
+        <div class="row justify-content-center align-items-center g-4">
+            <div class="col-6 col-md-3 text-center">
+                <div class="trust-logo bg-light rounded-3 p-3 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-hospital fs-2 text-primary"></i>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+                <div class="trust-logo bg-light rounded-3 p-3 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-building fs-2 text-success"></i>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+                <div class="trust-logo bg-light rounded-3 p-3 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-globe-americas fs-2 text-info"></i>
+                </div>
+            </div>
+            <div class="col-6 col-md-3 text-center">
+                <div class="trust-logo bg-light rounded-3 p-3 h-100 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-shield-check fs-2 text-warning"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.hero-section {
+    min-height: 80vh;
+    position: relative;
+}
+
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.2) 100%);
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.animate-fade-in-delay {
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+.animate-fade-in-delay-2 {
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hero-card {
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.status-indicator {
+    width: 12px;
+    height: 12px;
+}
+
+.feature-card {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+    transform: scale(1.1);
+}
+
+.feature-number {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    color: #6c757d;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.trust-logo {
+    transition: all 0.3s ease;
+    min-height: 80px;
+}
+
+.trust-logo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+</style>
 {% endblock %}

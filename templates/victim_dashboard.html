@@ -1,65 +1,191 @@
 {% extends "base.html" %}
 
+{% block title %}Victim Dashboard - ReliefBridge{% endblock %}
+
 {% block content %}
-<div class="container my-5">
+<div class="container-fluid my-4">
+    <!-- Header Section -->
     <div class="row mb-4">
-        <div class="col">
-            <h2><i class="bi bi-house-heart-fill"></i> Victim Dashboard</h2>
-            <p class="text-muted">Manage your help requests and get assistance</p>
+        <div class="col-lg-8">
+            <div class="d-flex align-items-center mb-3">
+                <div class="me-3">
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                        <i class="bi bi-house-heart-fill text-primary fs-2"></i>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="fw-bold mb-1">Welcome, {{ session.user_name }}</h2>
+                    <p class="text-muted mb-0">Manage your emergency requests and get real-time assistance</p>
+                </div>
+            </div>
         </div>
-        <div class="col-auto">
-            <a href="{{ url_for('create_request') }}" class="btn btn-danger btn-lg">
-                <i class="bi bi-plus-circle-fill"></i> Request Help
-            </a>
+        <div class="col-lg-4 text-lg-end">
+            <div class="d-flex gap-2 justify-content-lg-end">
+                <a href="{{ url_for('create_request') }}" class="btn btn-danger btn-lg">
+                    <i class="bi bi-plus-circle-fill me-2"></i>Request Help
+                </a>
+                <a href="{{ url_for('track_help') }}" class="btn btn-outline-primary btn-lg">
+                    <i class="bi bi-radar me-2"></i>Track Help
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- My Requests -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-primary text-white">
-            <h5 class="mb-0"><i class="bi bi-list-ul"></i> My Help Requests</h5>
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 bg-gradient-primary text-white rounded-4">
+                <div class="card-body text-center">
+                    <i class="bi bi-exclamation-circle display-4 mb-2 opacity-75"></i>
+                    <h3 class="fw-bold">{{ requests|selectattr('status', 'equalto', 'pending')|list|length }}</h3>
+                    <p class="mb-0 opacity-75">Pending Requests</p>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 bg-gradient-info text-white rounded-4">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill display-4 mb-2 opacity-75"></i>
+                    <h3 class="fw-bold">{{ requests|selectattr('status', 'equalto', 'in_progress')|list|length }}</h3>
+                    <p class="mb-0 opacity-75">In Progress</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 bg-gradient-success text-white rounded-4">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle display-4 mb-2 opacity-75"></i>
+                    <h3 class="fw-bold">{{ requests|selectattr('status', 'equalto', 'completed')|list|length }}</h3>
+                    <p class="mb-0 opacity-75">Completed</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 bg-gradient-warning text-white rounded-4">
+                <div class="card-body text-center">
+                    <i class="bi bi-clock display-4 mb-2 opacity-75"></i>
+                    <h3 class="fw-bold">{{ active_requests|length }}</h3>
+                    <p class="mb-0 opacity-75">Active Now</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Requests Section -->
+    <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white border-0 py-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h4 class="fw-bold mb-1">
+                        <i class="bi bi-list-ul text-primary me-2"></i>My Help Requests
+                    </h4>
+                    <p class="text-muted mb-0">Track and manage all your emergency assistance requests</p>
+                </div>
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="statusFilter" id="all" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="all">All</label>
+
+                    <input type="radio" class="btn-check" name="statusFilter" id="active" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="active">Active</label>
+
+                    <input type="radio" class="btn-check" name="statusFilter" id="completed" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="completed">Completed</label>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
             {% if requests %}
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
                             <tr>
-                                <th>Type</th>
-                                <th>Description</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Volunteer</th>
-                                <th>Created</th>
+                                <th class="border-0 px-4 py-3">Request</th>
+                                <th class="border-0 py-3">Priority</th>
+                                <th class="border-0 py-3">Status</th>
+                                <th class="border-0 py-3">Volunteer</th>
+                                <th class="border-0 py-3">Location</th>
+                                <th class="border-0 py-3">Created</th>
+                                <th class="border-0 py-3">Actions</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="requestsTable">
                             {% for req in requests %}
-                            <tr>
-                                <td>
-                                    <span class="badge bg-info">{{ req.request_type }}</span>
+                            <tr class="request-row" data-status="{{ req.status }}">
+                                <td class="px-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="me-3">
+                                            <div class="bg-{{ 'info' if req.request_type == 'food' else 'danger' if req.request_type == 'medical' else 'warning' if req.request_type == 'shelter' else 'success' }} bg-opacity-10 rounded-circle p-2">
+                                                <i class="bi bi-{{ 'egg-fried' if req.request_type == 'food' else 'heart-pulse' if req.request_type == 'medical' else 'house' if req.request_type == 'shelter' else 'truck' }} text-{{ 'info' if req.request_type == 'food' else 'danger' if req.request_type == 'medical' else 'warning' if req.request_type == 'shelter' else 'success' }}"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ req.request_type.title() }} Assistance</h6>
+                                            <p class="text-muted mb-0 small">{{ req.description[:60] }}...</p>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td>{{ req.description[:50] }}...</td>
-                                <td>
+                                <td class="py-3">
                                     {% if req.priority == 'high' %}
-                                        <span class="badge bg-danger">High</span>
+                                        <span class="badge bg-danger fs-6">
+                                            <i class="bi bi-exclamation-triangle-fill me-1"></i>URGENT
+                                        </span>
                                     {% elif req.priority == 'medium' %}
-                                        <span class="badge bg-warning">Medium</span>
+                                        <span class="badge bg-warning fs-6">MEDIUM</span>
                                     {% else %}
-                                        <span class="badge bg-secondary">Low</span>
+                                        <span class="badge bg-secondary fs-6">LOW</span>
                                     {% endif %}
                                 </td>
-                                <td>
+                                <td class="py-3">
                                     {% if req.status == 'pending' %}
-                                        <span class="badge bg-warning">Pending</span>
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-grow spinner-grow-sm text-warning me-2" style="width: 0.8rem; height: 0.8rem;"></div>
+                                            <span class="badge bg-warning">Pending</span>
+                                        </div>
                                     {% elif req.status == 'in_progress' %}
-                                        <span class="badge bg-info">In Progress</span>
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-grow spinner-grow-sm text-info me-2" style="width: 0.8rem; height: 0.8rem;"></div>
+                                            <span class="badge bg-info">In Progress</span>
+                                        </div>
                                     {% else %}
-                                        <span class="badge bg-success">Completed</span>
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle-fill me-1"></i>Completed
+                                        </span>
                                     {% endif %}
                                 </td>
-                                <td>{{ req.get('volunteer_name', 'Not assigned') }}</td>
-                                <td>{{ req.created_at[:10] }}</td>
+                                <td class="py-3">
+                                    {% if req.volunteer_name %}
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-success bg-opacity-10 rounded-circle me-2 p-1">
+                                                <i class="bi bi-person-check text-success"></i>
+                                            </div>
+                                            <span class="fw-semibold">{{ req.volunteer_name }}</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">
+                                            <i class="bi bi-clock me-1"></i>Waiting for volunteer
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-geo-alt me-1"></i>{{ req.location[:30] }}...
+                                    </small>
+                                </td>
+                                <td class="py-3">
+                                    <small class="text-muted">{{ req.created_at[:10] }}</small>
+                                </td>
+                                <td class="py-3">
+                                    <div class="btn-group">
+                                        {% if req.status in ['pending', 'in_progress'] %}
+                                        <a href="{{ url_for('track_help') }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-radar"></i>
+                                        </a>
+                                        {% endif %}
+                                        <button class="btn btn-sm btn-outline-secondary" onclick="viewDetails('{{ req["$id"] }}')">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -67,12 +193,76 @@
                 </div>
             {% else %}
                 <div class="text-center py-5">
-                    <i class="bi bi-inbox display-1 text-muted"></i>
-                    <p class="lead mt-3">You haven't created any help requests yet.</p>
-                    <a href="{{ url_for('create_request') }}" class="btn btn-primary">Create Your First Request</a>
+                    <div class="mb-4">
+                        <i class="bi bi-inbox display-1 text-muted"></i>
+                    </div>
+                    <h4 class="fw-bold text-muted mb-3">No Help Requests Yet</h4>
+                    <p class="text-muted mb-4">You haven't created any help requests. If you need assistance, don't hesitate to reach out.</p>
+                    <a href="{{ url_for('create_request') }}" class="btn btn-primary btn-lg px-5">
+                        <i class="bi bi-plus-circle-fill me-2"></i>Create Your First Request
+                    </a>
                 </div>
             {% endif %}
         </div>
     </div>
+
+    <!-- Emergency Contact Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="alert alert-danger border-0 rounded-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-exclamation-triangle-fill fs-2 me-3 text-danger"></i>
+                    <div>
+                        <h5 class="fw-bold mb-1">Emergency Situation?</h5>
+                        <p class="mb-0">If you're in immediate danger or need urgent medical attention, call emergency services immediately.</p>
+                    </div>
+                    <div class="ms-auto">
+                        <a href="tel:911" class="btn btn-danger btn-lg fw-bold">
+                            <i class="bi bi-telephone-fill me-2"></i>911
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+// Status filter functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('input[name="statusFilter"]');
+    const requestRows = document.querySelectorAll('.request-row');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('change', function() {
+            const filter = this.id;
+
+            requestRows.forEach(row => {
+                const status = row.dataset.status;
+
+                if (filter === 'all') {
+                    row.style.display = '';
+                } else if (filter === 'active' && (status === 'pending' || status === 'in_progress')) {
+                    row.style.display = '';
+                } else if (filter === 'completed' && status === 'completed') {
+                    row.style.display = '';
+                } else if (filter !== 'all' && filter !== status && 
+                          !(filter === 'active' && (status === 'pending' || status === 'in_progress'))) {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Auto-refresh every 60 seconds
+    setInterval(function() {
+        window.location.reload();
+    }, 60000);
+});
+
+function viewDetails(requestId) {
+    // In a real app, this would open a modal with request details
+    alert('Request details functionality would be implemented here.');
+}
+</script>
 {% endblock %}
