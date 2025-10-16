@@ -14,111 +14,118 @@
                     <h3 class="fw-bold mb-2">Request Emergency Help</h3>
                     <p class="mb-0 opacity-75">Get connected with volunteers and organizations in your area</p>
                 </div>
-
-                <div class="card-body p-5">
+                
+                <div class="card-body p-5" style="background-color: #ffffff;">
                     <!-- Emergency Alert -->
                     <div class="alert alert-warning border-0 rounded-3 mb-4">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                            <i class="bi bi-info-circle-fill fs-4 me-3 text-warning"></i>
                             <div>
                                 <strong>Life-threatening emergency?</strong><br>
-                                <small>If you're in immediate danger, call 911 first, then create your request here for additional support.</small>
+                                <small class="text-dark">If you're in immediate danger, call 911 first, then create your request here for additional support.</small>
                             </div>
                             <a href="tel:911" class="btn btn-danger ms-auto">
                                 <i class="bi bi-telephone-fill me-1"></i>911
                             </a>
                         </div>
                     </div>
-
+                    
                     <form method="POST" action="{{ url_for('create_request') }}" class="needs-validation" novalidate id="requestForm">
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label for="request_type" class="form-label fw-semibold">
+                                <label for="request_type" class="form-label fw-semibold text-dark">
                                     <i class="bi bi-tag me-2"></i>Type of Help Needed
                                 </label>
-                                <select class="form-select form-select-lg" id="request_type" name="request_type" required>
-                                    <option value="">Select type...</option>
-                                    <option value="food">🍲 Food & Water</option>
-                                    <option value="medical">🩺 Medical Aid</option>
-                                    <option value="shelter">🏠 Shelter</option>
-                                    <option value="rescue">🚨 Rescue Operation</option>
-                                    <option value="transport">🚗 Transportation</option>
-                                    <option value="other">📋 Other</option>
+                                <select class="form-select form-select-lg" id="request_type" name="request_type" required 
+                                        style="background-color: #f8f9fa; color: #212529; border: 2px solid #dee2e6;">
+                                    <option value="" style="color: #6c757d;">Select type...</option>
+                                    <option value="food" style="color: #212529;">🍲 Food & Water</option>
+                                    <option value="medical" style="color: #212529;">🩺 Medical Aid</option>
+                                    <option value="shelter" style="color: #212529;">🏠 Shelter</option>
+                                    <option value="rescue" style="color: #212529;">🚨 Rescue Operation</option>
+                                    <option value="transport" style="color: #212529;">🚗 Transportation</option>
+                                    <option value="other" style="color: #212529;">📋 Other</option>
                                 </select>
                                 <div class="invalid-feedback">Please select the type of help you need.</div>
                             </div>
-
+                            
                             <div class="col-md-6">
-                                <label for="priority" class="form-label fw-semibold">
+                                <label for="priority" class="form-label fw-semibold text-dark">
                                     <i class="bi bi-speedometer me-2"></i>Priority Level
                                 </label>
-                                <select class="form-select form-select-lg" id="priority" name="priority" required>
-                                    <option value="high">🔴 High (Urgent - Life threatening)</option>
-                                    <option value="medium">🟡 Medium (Important)</option>
-                                    <option value="low">🟢 Low (When possible)</option>
+                                <select class="form-select form-select-lg" id="priority" name="priority" required
+                                        style="background-color: #f8f9fa; color: #212529; border: 2px solid #dee2e6;">
+                                    <option value="high" style="color: #dc3545; font-weight: bold;">🔴 High (Urgent - Life threatening)</option>
+                                    <option value="medium" style="color: #ffc107; font-weight: bold;">🟡 Medium (Important)</option>
+                                    <option value="low" style="color: #198754; font-weight: bold;">🟢 Low (When possible)</option>
                                 </select>
                                 <div class="invalid-feedback">Please select the priority level.</div>
                             </div>
                         </div>
-
+                        
                         <div class="mb-4">
-                            <label for="description" class="form-label fw-semibold">
+                            <label for="description" class="form-label fw-semibold text-dark">
                                 <i class="bi bi-chat-text me-2"></i>Detailed Description
                             </label>
                             <textarea class="form-control" id="description" name="description" rows="4" required 
+                                      style="background-color: #f8f9fa; color: #212529; border: 2px solid #dee2e6;"
                                       placeholder="Please provide detailed information about your situation and exactly what help you need. Include any relevant details about your condition, resources needed, or special requirements..."></textarea>
-                            <div class="form-text">
+                            <div class="form-text text-dark">
                                 <small>Be as specific as possible to help volunteers understand how to assist you</small>
                             </div>
                             <div class="invalid-feedback">Please describe your situation and what help you need.</div>
                         </div>
-
+                        
                         <div class="mb-4">
-                            <label for="location" class="form-label fw-semibold">
+                            <label for="location" class="form-label fw-semibold text-dark">
                                 <i class="bi bi-geo-alt me-2"></i>Your Location
                             </label>
                             <input type="text" class="form-control form-control-lg" id="location" name="location" required 
+                                   style="background-color: #f8f9fa; color: #212529; border: 2px solid #dee2e6;"
                                    placeholder="Enter your full address or nearest landmark">
-                            <div class="form-text">
+                            <div class="form-text text-dark">
                                 <small>Provide the most accurate location possible for volunteers to find you</small>
                             </div>
                             <div class="invalid-feedback">Please provide your location.</div>
                         </div>
-
+                        
                         <div class="row mb-4">
                             <div class="col-md-6">
-                                <label for="latitude" class="form-label fw-semibold">Latitude</label>
-                                <input type="number" step="any" class="form-control" id="latitude" name="latitude" required readonly>
+                                <label for="latitude" class="form-label fw-semibold text-dark">Latitude</label>
+                                <input type="number" step="any" class="form-control" id="latitude" name="latitude" required readonly
+                                       style="background-color: #e9ecef; color: #212529; border: 2px solid #dee2e6;">
                                 <div class="invalid-feedback">Location coordinates are required.</div>
                             </div>
                             <div class="col-md-6">
-                                <label for="longitude" class="form-label fw-semibold">Longitude</label>
-                                <input type="number" step="any" class="form-control" id="longitude" name="longitude" required readonly>
+                                <label for="longitude" class="form-label fw-semibold text-dark">Longitude</label>
+                                <input type="number" step="any" class="form-control" id="longitude" name="longitude" required readonly
+                                       style="background-color: #e9ecef; color: #212529; border: 2px solid #dee2e6;">
                                 <div class="invalid-feedback">Location coordinates are required.</div>
                             </div>
                         </div>
-
+                        
                         <div class="text-center mb-4">
                             <button type="button" class="btn btn-info btn-lg px-5" onclick="getLocation()">
                                 <i class="bi bi-geo-alt-fill me-2"></i>Get My Current Location
                             </button>
-                            <div class="form-text mt-2">
+                            <div class="form-text mt-2 text-dark">
                                 <small>Click to automatically fill in your GPS coordinates</small>
                             </div>
                         </div>
-
+                        
                         <div class="mb-4">
-                            <label for="contact_phone" class="form-label fw-semibold">
+                            <label for="contact_phone" class="form-label fw-semibold text-dark">
                                 <i class="bi bi-telephone me-2"></i>Contact Phone Number
                             </label>
                             <input type="tel" class="form-control form-control-lg" id="contact_phone" name="contact_phone" required 
+                                   style="background-color: #f8f9fa; color: #212529; border: 2px solid #dee2e6;"
                                    placeholder="+1 (555) 123-4567">
-                            <div class="form-text">
+                            <div class="form-text text-dark">
                                 <small>This number will be shared with volunteers who claim your request</small>
                             </div>
                             <div class="invalid-feedback">Please provide a contact phone number.</div>
                         </div>
-
+                        
                         <div class="d-grid">
                             <button type="submit" class="btn btn-danger btn-lg py-3 fw-semibold">
                                 <i class="bi bi-send-fill me-2"></i>Submit Help Request
@@ -126,7 +133,7 @@
                         </div>
                     </form>
                 </div>
-
+                
                 <div class="card-footer bg-light text-center py-3 rounded-bottom-4">
                     <small class="text-muted">
                         <i class="bi bi-shield-check text-success me-1"></i>
@@ -144,10 +151,10 @@ let locationObtained = false;
 function getLocation() {
     const button = event.target;
     const originalText = button.innerHTML;
-
+    
     button.innerHTML = '<i class="bi bi-spinner spinner-border spinner-border-sm me-2"></i>Getting Location...';
     button.disabled = true;
-
+    
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition, showError, {
             enableHighAccuracy: true,
@@ -157,22 +164,17 @@ function getLocation() {
     } else {
         showError({ code: 0, message: "Geolocation is not supported by this browser." });
     }
-
+    
     function showPosition(position) {
         document.getElementById('latitude').value = position.coords.latitude;
         document.getElementById('longitude').value = position.coords.longitude;
         locationObtained = true;
-
+        
         button.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Location Obtained';
         button.classList.remove('btn-info');
         button.classList.add('btn-success');
-
-        // Try to get address from coordinates
-        if (navigator.geolocation) {
-            reverseGeocode(position.coords.latitude, position.coords.longitude);
-        }
     }
-
+    
     function showError(error) {
         let message = "Unable to get location: ";
         switch(error.code) {
@@ -189,20 +191,10 @@ function getLocation() {
                 message += "An unknown error occurred.";
                 break;
         }
-
+        
         alert(message);
         button.innerHTML = originalText;
         button.disabled = false;
-    }
-}
-
-function reverseGeocode(lat, lng) {
-    // This would typically use a geocoding service
-    // For demo purposes, we'll just suggest they manually enter the address
-    const locationField = document.getElementById('location');
-    if (!locationField.value) {
-        locationField.placeholder = `Location obtained (${lat.toFixed(4)}, ${lng.toFixed(4)}) - Please enter your address`;
-        locationField.focus();
     }
 }
 
@@ -219,7 +211,7 @@ function reverseGeocode(lat, lng) {
                     event.stopPropagation();
                     return false;
                 }
-
+                
                 if (form.checkValidity() === false) {
                     event.preventDefault();
                     event.stopPropagation();
@@ -229,40 +221,64 @@ function reverseGeocode(lat, lng) {
         });
     }, false);
 })();
-
-// Auto-save form data
-const form = document.getElementById('requestForm');
-const formElements = form.querySelectorAll('input, select, textarea');
-
-formElements.forEach(element => {
-    element.addEventListener('input', () => {
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
-        localStorage.setItem('reliefbridge_request_draft', JSON.stringify(data));
-    });
-});
-
-// Load saved data
-window.addEventListener('load', () => {
-    const savedData = localStorage.getItem('reliefbridge_request_draft');
-    if (savedData) {
-        try {
-            const data = JSON.parse(savedData);
-            Object.keys(data).forEach(key => {
-                const field = form.querySelector(`[name="${key}"]`);
-                if (field && data[key]) {
-                    field.value = data[key];
-                }
-            });
-        } catch (e) {
-            console.warn('Error loading saved form data');
-        }
-    }
-});
-
-// Clear saved data on successful submit
-form.addEventListener('submit', () => {
-    localStorage.removeItem('reliefbridge_request_draft');
-});
 </script>
+
+<style>
+/* Fix select dropdown styling */
+select.form-select {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border: 2px solid #dee2e6 !important;
+}
+
+select.form-select:focus {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+select.form-select option {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    padding: 10px;
+}
+
+select.form-select option:hover {
+    background-color: #e9ecef !important;
+}
+
+/* Fix input styling */
+input.form-control,
+textarea.form-control {
+    background-color: #f8f9fa !important;
+    color: #212529 !important;
+    border: 2px solid #dee2e6 !important;
+}
+
+input.form-control:focus,
+textarea.form-control:focus {
+    background-color: #ffffff !important;
+    color: #212529 !important;
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Ensure all text is dark */
+.form-label,
+.form-text,
+.card-body {
+    color: #212529 !important;
+}
+
+/* Fix alert text */
+.alert {
+    color: #212529 !important;
+}
+
+.alert strong,
+.alert small {
+    color: #212529 !important;
+}
+</style>
 {% endblock %}
