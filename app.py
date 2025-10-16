@@ -136,68 +136,130 @@ def login():
 
 @app.route('/oauth/google')
 def google_oauth():
-    """Google OAuth login"""
+    """Initiate Google OAuth - Redirect to Appwrite OAuth"""
     try:
+        # Build OAuth URL manually
+        project_id = os.getenv('APPWRITE_PROJECT_ID')
+        
+        # These URLs must match what's in Appwrite Console
         success_url = url_for('oauth_callback', _external=True)
         failure_url = url_for('login', _external=True)
         
-        # NEW METHOD NAME: create_oauth2_session (no underscore between o and auth)
-        oauth_url = account.create_oauth2_session(
-            provider='google',
-            success=success_url,
-            failure=failure_url
+        # Appwrite OAuth URL format
+        oauth_url = (
+            f"https://cloud.appwrite.io/v1/account/sessions/oauth2/google?"
+            f"project={project_id}&"
+            f"success={success_url}&"
+            f"failure={failure_url}"
         )
         
         return redirect(oauth_url)
+        
     except Exception as e:
-        flash(f'Google login failed: {str(e)}', 'danger')
+        flash(f'OAuth initialization failed: {str(e)}', 'danger')
         return redirect(url_for('login'))
 
 
 @app.route('/oauth/callback')
 def oauth_callback():
-    """Enhanced OAuth callback handler"""
+    """Handle OAuth callback from Google"""
     try:
-        # Get the current user (already authenticated by Appwrite)
-        user_data = account.get()
-
-        # Check if user exists in database
+        # Get userId and secret from URL parameters
+        user_id = request.args.get('userId')
+        secret = request.args.get('secret')
+        
+        if not user_id:
+            flash('OAuth authentication failed. Please try again.', 'danger')
+            return redirect(url_for('login'))
+        
+        # Create a user client with the session
+        from appwrite.client import Client
+        from appwrite.services.account import Account
+        from appwrite.services.databases import Databases
+        from appwrite.query import Query
+        
+        # Create client for this user's session
+        user_client = Client()
+        user_client.set_endpoint(os.getenv('APPWRITE_ENDPOINT'))
+        user_client.set_project(os.getenv('APPWRITE_PROJECT_ID'))
+        
+        # Set the session using userId and secret
+        if secret:
+            user_client.set_session(secret)
+        
+        user_account = Account(user_client)
+        
+        # Get user details
         try:
-            user_doc = databases.get_document(
-                database_id=Config.DATABASE_ID,
-                collection_id=Config.USERS_COLLECTION_ID,
-                document_id=user_data['$id']
-            )
-            role = user_doc['role']
-
-            # Update last seen
-            databases.update_document(
-                database_id=Config.DATABASE_ID,
-                collection_id=Config.USERS_COLLECTION_ID,
-                document_id=user_data['$id'],
-                data={'last_seen': datetime.now().isoformat()}
-            )
-
-            # User exists, log them in
-            session['user_id'] = user_data['$id']
-            session['user_name'] = user_data['name']
-            session['role'] = role
-
-            flash(f'Welcome back, {user_data["name"]}!', 'success')
-            return redirect(url_for('dashboard'))
-
-        except AppwriteException:
-            # New OAuth user - need to complete profile
-            session['temp_user_id'] = user_data['$id']
-            session['temp_user_name'] = user_data['name']
-            session['temp_user_email'] = user_data['email']
-
-            flash('Please complete your profile to continue', 'info')
-            return redirect(url_for('complete_profile'))
-
+            user = user_account.get()
+            user_email = user['email']
+            user_name = user.get('name', user_email.split('@')[0])
+            
+            # Now check if user exists in our database
+            databases = Databases(user_client)
+            
+            try:
+                result = databases.list_documents(
+                    database_id=os.getenv('DATABASE_ID', 'reliefbridge_db'),
+                    collection_id='users',
+                    queries=[Query.equal('email', user_email)]
+                )
+                
+                if result['total'] > 0:
+                    # Existing user - create session
+                    user_doc = result['documents'][0]
+                    session['user_id'] = user_doc['$id']
+                    session['user_name'] = user_doc['name']
+                    session['role'] = user_doc['role']
+                    session['email'] = user_doc['email']
+                    session['appwrite_session'] = secret  # Store for future API calls
+                    
+                    flash(f'Welcome back, {user_doc["name"]}!', 'success')
+                    return redirect(url_for('dashboard'))
+                else:
+                    # New user - create account in database
+                    from appwrite.id import ID
+                    from datetime import datetime
+                    
+                    # Create user document
+                    new_user = databases.create_document(
+                        database_id=os.getenv('DATABASE_ID', 'reliefbridge_db'),
+                        collection_id='users',
+                        document_id=ID.unique(),
+                        data={
+                            'name': user_name,
+                            'email': user_email,
+                            'phone': '',  # Can be filled later
+                            'role': 'victim',  # Default role
+                            'location': '',
+                            'active': True,
+                            'created_at': datetime.utcnow().isoformat(),
+                            'last_seen': datetime.utcnow().isoformat()
+                        }
+                    )
+                    
+                    # Create session
+                    session['user_id'] = new_user['$id']
+                    session['user_name'] = user_name
+                    session['role'] = 'victim'
+                    session['email'] = user_email
+                    session['appwrite_session'] = secret
+                    
+                    flash(f'Welcome to ReliefBridge, {user_name}!', 'success')
+                    return redirect(url_for('dashboard'))
+                    
+            except Exception as db_error:
+                flash(f'Database error: {str(db_error)}', 'danger')
+                return redirect(url_for('login'))
+                
+        except Exception as account_error:
+            flash(f'Account error: {str(account_error)}', 'danger')
+            return redirect(url_for('login'))
+            
     except Exception as e:
-        flash(f'OAuth callback failed. Please try again.', 'danger')
+        flash(f'Authentication failed: {str(e)}', 'danger')
         return redirect(url_for('login'))
+
 
 @app.route('/complete-profile', methods=['GET', 'POST'])
 def complete_profile():
