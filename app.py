@@ -287,6 +287,33 @@ def get_requests():
         return jsonify(reqs)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+    
+@app.route('/navigate/<request_id>')
+@login_required
+def navigate_to_victim(request_id):
+    try:
+        if session.get('role') != 'volunteer':
+            flash('Only volunteers can access navigation', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        # Get the help request details
+        request_doc = databases.get_document(
+            database_id=Config.DATABASE_ID,
+            collection_id='help_requests',
+            document_id=request_id
+        )
+        
+        # Verify this volunteer claimed this task
+        if request_doc['volunteer_id'] != session.get('user_id'):
+            flash('You can only navigate to tasks you claimed', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        return render_template('navigate_to_victim.html', request=request_doc)
+    
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'danger')
+        return redirect(url_for('dashboard'))
 
 
 if __name__ == '__main__':

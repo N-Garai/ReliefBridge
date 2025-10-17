@@ -144,19 +144,24 @@
                                 <th>Priority</th>
                                 <th>Location</th>
                                 <th>Phone</th>
-                                <th>Action</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for r in my_claimed %}
                             <tr>
-                                <td>{{ r.user_name }}</td>
+                                <td><strong>{{ r.user_name }}</strong></td>
                                 <td><span class="badge bg-secondary">{{ r.request_type|title }}</span></td>
                                 <td><span class="badge bg-{{ 'danger' if r.priority == 'high' else 'warning' }}">{{ r.priority|upper }}</span></td>
                                 <td>{{ r.location[:40] }}...</td>
-                                <td><a href="tel:{{ r.contact_phone }}">{{ r.contact_phone }}</a></td>
+                                <td><a href="tel:{{ r.contact_phone }}" class="btn btn-sm btn-info"><i class="bi bi-telephone-fill"></i> Call</a></td>
                                 <td>
-                                    <a href="{{ url_for('complete_task', request_id=r['$id']) }}" class="btn btn-sm btn-success">Complete</a>
+                                    <a href="{{ url_for('navigate_to_victim', request_id=r['$id']) }}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-pin-map-fill"></i> Navigate
+                                    </a>
+                                    <a href="{{ url_for('complete_task', request_id=r['$id']) }}" class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-circle-fill"></i> Complete
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
