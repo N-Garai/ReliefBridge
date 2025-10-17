@@ -1,24 +1,119 @@
 {% extends "base.html" %}
+
+{% block title %}Request Help - ReliefBridge{% endblock %}
+
 {% block content %}
 <div class="container my-5">
-  <div class="card shadow"><div class="card-header bg-danger text-white text-center"><h3>Request Help</h3></div>
-  <div class="card-body p-4">
-    <form method="POST">
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label text-dark fw-bold">Type</label><select name="request_type" class="form-select" required><option value="food">Food</option><option value="medical">Medical</option><option value="shelter">Shelter</option><option value="rescue">Rescue</option></select></div>
-        <div class="col-md-6"><label class="form-label text-dark fw-bold">Priority</label><select name="priority" class="form-select" required><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
-      </div>
-      <div class="mb-3"><label class="form-label text-dark fw-bold">Description</label><textarea name="description" class="form-control" rows="3" required></textarea></div>
-      <div class="mb-3"><label class="form-label text-dark fw-bold">Location</label><input type="text" name="location" class="form-control" required></div>
-      <div class="row mb-3">
-        <div class="col-md-6"><label class="form-label text-dark fw-bold">Latitude</label><input type="number" step="any" name="latitude" id="latitude" class="form-control" required readonly></div>
-        <div class="col-md-6"><label class="form-label text-dark fw-bold">Longitude</label><input type="number" step="any" name="longitude" id="longitude" class="form-control" required readonly></div>
-      </div>
-      <button type="button" class="btn btn-info mb-3" onclick="getLocation()">Get Location</button>
-      <div class="mb-3"><label class="form-label text-dark fw-bold">Phone</label><input type="tel" name="contact_phone" class="form-control" required></div>
-      <button type="submit" class="btn btn-danger w-100 btn-lg">Submit</button>
-    </form>
-  </div></div>
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-danger text-white text-center py-4 rounded-top-4">
+                    <i class="bi bi-exclamation-triangle-fill display-4 mb-3"></i>
+                    <h3 class="fw-bold mb-2">Request Emergency Help</h3>
+                    <p class="mb-0">Get connected with volunteers in your area</p>
+                </div>
+                
+                <div class="card-body p-5 bg-white">
+                    <div class="alert alert-warning border-0 rounded-3 mb-4">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-info-circle-fill fs-4 me-3 text-warning"></i>
+                            <div>
+                                <strong class="text-dark">Life-threatening emergency?</strong><br>
+                                <small class="text-dark">Call 911 first, then create your request for additional support.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="POST" action="{{ url_for('create_request') }}" id="requestForm">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="request_type" class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-tag me-2"></i>Type of Help Needed
+                                </label>
+                                <select class="form-select form-select-lg custom-select" id="request_type" name="request_type" required>
+                                    <option value="">Select type...</option>
+                                    <option value="food">🍲 Food & Water</option>
+                                    <option value="medical">🩺 Medical Aid</option>
+                                    <option value="shelter">🏠 Shelter</option>
+                                    <option value="rescue">🚨 Rescue Operation</option>
+                                    <option value="transport">🚗 Transportation</option>
+                                    <option value="other">📋 Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label fw-semibold text-dark">
+                                    <i class="bi bi-speedometer me-2"></i>Priority Level
+                                </label>
+                                <select class="form-select form-select-lg custom-select" id="priority" name="priority" required>
+                                    <option value="high">🔴 High (Urgent - Life threatening)</option>
+                                    <option value="medium">🟡 Medium (Important)</option>
+                                    <option value="low">🟢 Low (When possible)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="description" class="form-label fw-semibold text-dark">
+                                <i class="bi bi-chat-text me-2"></i>Detailed Description
+                            </label>
+                            <textarea class="form-control custom-input" id="description" name="description" rows="4" required 
+                                      placeholder="Describe your situation and what help you need..."></textarea>
+                        </div>
+                        
+                        <!-- MAP LOCATION PICKER -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold text-dark">
+                                <i class="bi bi-geo-alt me-2"></i>Your Location
+                            </label>
+                            <p class="text-muted small mb-2">
+                                Click "Get My Location" or click on the map to set your location
+                            </p>
+                            
+                            <!-- Buttons -->
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-info btn-lg" onclick="getMyLocation()">
+                                    <i class="bi bi-crosshair me-2"></i>Get My Current Location
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-lg ms-2" onclick="searchAddress()">
+                                    <i class="bi bi-search me-2"></i>Search Address
+                                </button>
+                            </div>
+                            
+                            <!-- Interactive Map -->
+                            <div id="locationMap" style="height: 400px; border-radius: 12px; border: 2px solid #dee2e6;"></div>
+                            
+                            <!-- Address Display -->
+                            <div class="mt-3">
+                                <input type="text" class="form-control custom-input" id="location" name="location" required readonly
+                                       placeholder="Location will appear here after selecting on map">
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden fields for coordinates -->
+                        <input type="hidden" id="latitude" name="latitude" required>
+                        <input type="hidden" id="longitude" name="longitude" required>
+                        
+                        <div class="mb-4">
+                            <label for="contact_phone" class="form-label fw-semibold text-dark">
+                                <i class="bi bi-telephone me-2"></i>Contact Phone Number
+                            </label>
+                            <input type="tel" class="form-control form-control-lg custom-input" id="contact_phone" name="contact_phone" required 
+                                   placeholder="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-danger btn-lg py-3 fw-semibold" id="submitBtn" disabled>
+                                <i class="bi bi-send-fill me-2"></i>Submit Help Request
+                            </button>
+                            <small class="text-muted text-center mt-2">Please select your location on the map first</small>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-<script src="{{ url_for('static', filename='js/geolocation.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/map_picker.js') }}"></script>
 {% endblock %}
