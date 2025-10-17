@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Navigate to Victim - ReliefBridge{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+    <div class="row g-0">
+        <!-- Navigation Map -->
+        <div class="col-lg-8">
+            <div id="navigationMap" style="height: calc(100vh - 56px);"></div>
+        </div>
+        
+        <!-- Navigation Panel -->
+        <div class="col-lg-4 bg-white shadow-lg" style="height: calc(100vh - 56px); overflow-y: auto;">
+            <div class="p-4">
+                <!-- Victim Info -->
+                <div class="card border-danger mb-3">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-person-fill me-2"></i>Victim Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6><strong>{{ request.user_name }}</strong></h6>
+                        <p class="mb-2"><i class="bi bi-tag me-2"></i>{{ request.request_type|title }}</p>
+                        <p class="mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Priority: <span class="badge bg-{{ 'danger' if request.priority == 'high' else 'warning' }}">{{ request.priority|upper }}</span></p>
+                        <p class="mb-2"><i class="bi bi-chat-text me-2"></i>{{ request.description[:100] }}...</p>
+                        <div class="d-grid gap-2 mt-3">
+                            <a href="tel:{{ request.contact_phone }}" class="btn btn-info btn-lg">
+                                <i class="bi bi-telephone-fill me-2"></i>Call Victim
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Navigation Stats -->
+                <div class="card border-primary mb-3">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0"><i class="bi bi-speedometer me-2"></i>Navigation Info</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center mb-3">
+                            <div class="col-6">
+                                <h3 id="distance" class="text-primary">--</h3>
+                                <small class="text-muted">Distance</small>
+                            </div>
+                            <div class="col-6">
+                                <h3 id="eta" class="text-success">--</h3>
+                                <small class="text-muted">ETA</small>
+                            </div>
+                        </div>
+                        <div class="progress mb-2" style="height: 10px;">
+                            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" id="progressBar" style="width: 0%"></div>
+                        </div>
+                        <p class="text-center mb-0" id="status"><small>Calculating route...</small></p>
+                    </div>
+                </div>
+                
+                <!-- Location Info -->
+                <div class="card border-info mb-3">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i>Location Details</h6>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Victim Location:</strong></p>
+                        <p class="text-muted small mb-3">{{ request.location }}</p>
+                        <p class="mb-1"><strong>Coordinates:</strong></p>
+                        <p class="text-muted small">Lat: {{ request.latitude }}, Lng: {{ request.longitude }}</p>
+                        <button class="btn btn-sm btn-outline-primary w-100 mt-2" onclick="openInGoogleMaps()">
+                            <i class="bi bi-map me-2"></i>Open in Google Maps
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="d-grid gap-2 mt-3">
+                    <button class="btn btn-success btn-lg" onclick="markAsArrived()">
+                        <i class="bi bi-geo-fill me-2"></i>Mark as Arrived
+                    </button>
+                    <a href="{{ url_for('complete_task', request_id=request['$id']) }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle-fill me-2"></i>Complete Task
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Victim's location from backend
+const victimLat = {{ request.latitude }};
+const victimLng = {{ request.longitude }};
+const victimName = "{{ request.user_name }}";
+const victimPhone = "{{ request.contact_phone }}";
+const victimAddress = "{{ request.location }}";
+</script>
+<script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+{% endblock %}

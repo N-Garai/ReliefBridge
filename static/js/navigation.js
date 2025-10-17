@@ -13,16 +13,16 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeNavigation() {
-    // Create map centered between volunteer and victim (will update)
+    // Create map centered on victim location
     map = L.map('navigationMap').setView([victimLat, victimLng], 13);
     
-    // Add tile layer
+    // Add tile layer (OpenStreetMap)
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
     }).addTo(map);
     
-    // Add victim marker (red)
+    // Add victim marker (RED)
     victimMarker = L.marker([victimLat, victimLng], {
         icon: L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -34,7 +34,7 @@ function initializeNavigation() {
         })
     }).addTo(map);
     
-    victimMarker.bindPopup(`<strong>${victimName}</strong><br>Victim Location<br><a href="tel:${victimPhone}">Call Now</a>`);
+    victimMarker.bindPopup(`<strong>${victimName}</strong><br>Victim Location<br><a href="tel:${victimPhone}">Call Now</a>`).openPopup();
     
     // Start tracking volunteer location
     startTracking();
@@ -63,7 +63,7 @@ function updateVolunteerPosition(position) {
     
     volunteerPosition = { lat, lng };
     
-    // Update or create volunteer marker (blue)
+    // Update or create volunteer marker (BLUE)
     if (volunteerMarker) {
         volunteerMarker.setLatLng([lat, lng]);
     } else {
@@ -81,7 +81,7 @@ function updateVolunteerPosition(position) {
         volunteerMarker.bindPopup('<strong>Your Location</strong><br>Volunteer Position');
     }
     
-    // Draw route
+    // Draw route line
     drawRoute(lat, lng, victimLat, victimLng);
     
     // Calculate distance and ETA
@@ -101,8 +101,7 @@ function drawRoute(fromLat, fromLng, toLat, toLng) {
         map.removeLayer(routeLine);
     }
     
-    // Get routing from OpenRouteService or use simple line
-    // For simplicity, drawing a straight line (you can add turn-by-turn routing API)
+    // Draw simple straight line route
     routeLine = L.polyline([
         [fromLat, fromLng],
         [toLat, toLng]
@@ -112,62 +111,6 @@ function drawRoute(fromLat, fromLng, toLat, toLng) {
         opacity: 0.7,
         dashArray: '10, 10'
     }).addTo(map);
-    
-    // Get actual turn-by-turn directions (optional - using OSRM)
-    getDirections(fromLat, fromLng, toLat, toLng);
-}
-
-function getDirections(fromLat, fromLng, toLat, toLng) {
-    // Using OSRM (Open Source Routing Machine) for free routing
-    const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&steps=true`;
-    
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.routes && data.routes.length > 0) {
-                const route = data.routes[0];
-                
-                // Draw actual route
-                const routeCoords = polyline.decode(route.geometry);
-                if (routeLine) map.removeLayer(routeLine);
-                
-                routeLine = L.polyline(routeCoords, {
-                    color: '#0d6efd',
-                    weight: 5,
-                    opacity: 0.8
-                }).addTo(map);
-                
-                // Show turn-by-turn directions
-                displayDirections(route.legs[0].steps);
-            }
-        })
-        .catch(error => {
-            console.log('Routing error:', error);
-            // Fallback to straight line already drawn
-        });
-}
-
-function displayDirections(steps) {
-    const directionsDiv = document.getElementById('directions');
-    let html = '<ol class="list-group list-group-flush">';
-    
-    steps.forEach((step, index) => {
-        const distance = (step.distance / 1000).toFixed(2); // km
-        const instruction = step.maneuver.instruction || 'Continue';
-        
-        html += `
-            <li class="list-group-item d-flex align-items-center">
-                <span class="badge bg-primary rounded-circle me-3">${index + 1}</span>
-                <div>
-                    <strong>${instruction}</strong><br>
-                    <small class="text-muted">${distance} km</small>
-                </div>
-            </li>
-        `;
-    });
-    
-    html += '</ol>';
-    directionsDiv.innerHTML = html;
 }
 
 function updateStats(fromLat, fromLng, toLat, toLng) {
@@ -188,18 +131,19 @@ function updateStats(fromLat, fromLng, toLat, toLng) {
     const progress = Math.max(0, Math.min(100, ((maxDistance - distance) / maxDistance) * 100));
     document.getElementById('progressBar').style.width = progress + '%';
     
-    // Update status
+    // Update status message
+    const statusElement = document.getElementById('status');
     if (distance < 0.1) {
-        document.getElementById('status').textContent = '✅ You have arrived!';
-        document.getElementById('status').className = 'text-success fw-bold';
+        statusElement.innerHTML = '<strong class="text-success">✅ You have arrived!</strong>';
     } else if (distance < 0.5) {
-        document.getElementById('status').textContent = '📍 Very close - less than 500m';
+        statusElement.innerHTML = '<strong class="text-warning">📍 Very close - less than 500m</strong>';
     } else {
-        document.getElementById('status').textContent = `🚗 On the way - ${distance.toFixed(2)} km remaining`;
+        statusElement.innerHTML = `<strong>🚗 On the way - ${distance.toFixed(2)} km remaining</strong>`;
     }
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
+    // Haversine formula to calculate distance between two points
     const R = 6371; // Radius of Earth in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -212,7 +156,23 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 function handleLocationError(error) {
     console.error('Location error:', error);
-    alert('Unable to get your location. Please enable GPS and refresh.');
+    let errorMsg = 'Unable to get your location. ';
+    
+    switch(error.code) {
+        case error.PERMISSION_DENIED:
+            errorMsg += 'Please enable location permissions.';
+            break;
+        case error.POSITION_UNAVAILABLE:
+            errorMsg += 'Location information unavailable.';
+            break;
+        case error.TIMEOUT:
+            errorMsg += 'Location request timed out.';
+            break;
+        default:
+            errorMsg += 'Unknown error occurred.';
+    }
+    
+    alert(errorMsg);
 }
 
 function markAsArrived() {
@@ -229,25 +189,15 @@ function markAsArrived() {
         } else {
             alert('⚠️ You are still ' + distance.toFixed(2) + ' km away from the victim.');
         }
+    } else {
+        alert('⚠️ Unable to determine your location. Please wait...');
     }
 }
 
-function shareLocation() {
-    if (volunteerPosition) {
-        const shareUrl = `https://www.google.com/maps?q=${volunteerPosition.lat},${volunteerPosition.lng}`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: 'My Location',
-                text: 'I am here to help you!',
-                url: shareUrl
-            });
-        } else {
-            // Copy to clipboard
-            navigator.clipboard.writeText(shareUrl);
-            alert('Location link copied to clipboard!');
-        }
-    }
+function openInGoogleMaps() {
+    // Open Google Maps with directions
+    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${victimLat},${victimLng}`;
+    window.open(mapsUrl, '_blank');
 }
 
 // Stop tracking when leaving page
@@ -256,37 +206,3 @@ window.addEventListener('beforeunload', function() {
         navigator.geolocation.clearWatch(watchId);
     }
 });
-
-// Add polyline decoder (needed for OSRM)
-const polyline = {
-    decode: function(str, precision) {
-        let index = 0, lat = 0, lng = 0, coordinates = [], shift = 0, result = 0, byte = null, latitude_change, longitude_change, factor = Math.pow(10, precision || 5);
-        
-        while (index < str.length) {
-            byte = null; shift = 0; result = 0;
-            do {
-                byte = str.charCodeAt(index++) - 63;
-                result |= (byte & 0x1f) << shift;
-                shift += 5;
-            } while (byte >= 0x20);
-            
-            latitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
-            shift = result = 0;
-            
-            do {
-                byte = str.charCodeAt(index++) - 63;
-                result |= (byte & 0x1f) << shift;
-                shift += 5;
-            } while (byte >= 0x20);
-            
-            longitude_change = ((result & 1) ? ~(result >> 1) : (result >> 1));
-            
-            lat += latitude_change;
-            lng += longitude_change;
-            
-            coordinates.push([lat / factor, lng / factor]);
-        }
-        
-        return coordinates;
-    }
-};
