@@ -4,34 +4,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    # Flask Configuration
-    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
-    DEBUG = os.getenv('DEBUG', 'False') == 'True'
-    FLASK_ENV = os.getenv('FLASK_ENV', 'development')
-
-    # Appwrite Configuration
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret')
+    DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
     APPWRITE_ENDPOINT = os.getenv('APPWRITE_ENDPOINT', 'https://cloud.appwrite.io/v1')
     APPWRITE_PROJECT_ID = os.getenv('APPWRITE_PROJECT_ID')
     APPWRITE_API_KEY = os.getenv('APPWRITE_API_KEY')
-
-    # OAuth Configuration
-    GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
-    GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
-
-    # Database IDs
     DATABASE_ID = os.getenv('DATABASE_ID', 'reliefbridge_db')
-
-    # Collection IDs
-    USERS_COLLECTION_ID = 'users'
-    REQUESTS_COLLECTION_ID = 'help_requests'
-    RESOURCES_COLLECTION_ID = 'resources'
-    VOLUNTEERS_COLLECTION_ID = 'volunteers'
-    NOTIFICATIONS_COLLECTION_ID = 'notifications'
-
-    # Storage Bucket IDs
-    DOCUMENTS_BUCKET_ID = 'documents'
-    IMAGES_BUCKET_ID = 'images'
-
-    # Domain Configuration
-    DOMAIN = os.getenv('DOMAIN', 'localhost:5000')
-    PRODUCTION_DOMAIN = os.getenv('PRODUCTION_DOMAIN', 'your-domain.com')
+    SESSION_TYPE = 'filesystem'
+    PERMANENT_SESSION_LIFETIME = 3600

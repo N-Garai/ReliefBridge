@@ -1,0 +1,1 @@
+function getLocation(){if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{document.getElementById('latitude').value=pos.coords.latitude;document.getElementById('longitude').value=pos.coords.longitude;alert('Location obtained!')},err=>alert('Error getting location'))}else{alert('Geolocation not supported')}}

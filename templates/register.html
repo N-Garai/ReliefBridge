@@ -1,189 +1,25 @@
 {% extends "base.html" %}
-
-{% block title %}Create Account - ReliefBridge{% endblock %}
-
 {% block content %}
-<div class="container-fluid">
-    <div class="row min-vh-100">
-        <!-- Left Side - Registration Form -->
-        <div class="col-lg-7 d-flex align-items-center">
-            <div class="w-100 px-4 px-lg-5 py-5">
-                <div class="mx-auto" style="max-width: 500px;">
-                    <div class="text-center mb-5">
-                        <div class="d-lg-none mb-3">
-                            <i class="bi bi-heart-pulse-fill text-primary display-4"></i>
-                        </div>
-                        <h2 class="fw-bold mb-2">Join ReliefBridge</h2>
-                        <p class="text-muted">Create your professional disaster relief account</p>
-                    </div>
-
-                    <!-- Google OAuth Button -->
-                    <div class="mb-4">
-                        <a href="{{ url_for('google_oauth') }}" class="btn btn-outline-dark w-100 py-3 d-flex align-items-center justify-content-center">
-                            <svg class="me-2" width="18" height="18" viewBox="0 0 18 18">
-                                <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18Z"/>
-                                <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.04a4.8 4.8 0 0 1-2.7.75 4.8 4.8 0 0 1-4.52-3.32H1.83v2.07A8 8 0 0 0 8.98 17Z"/>
-                                <path fill="#FBBC04" d="M4.46 10.45a4.8 4.8 0 0 1 0-3.09V5.29H1.83a8 8 0 0 0 0 7.18l2.63-2.02Z"/>
-                                <path fill="#EA4335" d="M8.98 4.72c1.16 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.29L4.46 7.4A4.8 4.8 0 0 1 8.98 4.72Z"/>
-                            </svg>
-                            Continue with Google
-                        </a>
-                    </div>
-
-                    <!-- Divider -->
-                    <div class="text-center mb-4">
-                        <div class="d-flex align-items-center">
-                            <div class="flex-grow-1 border-top"></div>
-                            <span class="px-3 text-muted small">or create account with email</span>
-                            <div class="flex-grow-1 border-top"></div>
-                        </div>
-                    </div>
-
-                    <!-- Registration Form -->
-                    <form method="POST" action="{{ url_for('register') }}" class="needs-validation" novalidate>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="name" class="form-label fw-semibold">Full Name</label>
-                                <input type="text" class="form-control" id="name" name="name" 
-                                       placeholder="Enter your full name" required>
-                                <div class="invalid-feedback">
-                                    Please provide your full name.
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="phone" class="form-label fw-semibold">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" 
-                                       placeholder="+1 (555) 123-4567" required>
-                                <div class="invalid-feedback">
-                                    Please provide a valid phone number.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label fw-semibold">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   placeholder="Enter your email address" required>
-                            <div class="invalid-feedback">
-                                Please provide a valid email address.
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="password" class="form-label fw-semibold">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" 
-                                   placeholder="Create a strong password" required minlength="8">
-                            <div class="form-text">
-                                <small>Must be at least 8 characters long</small>
-                            </div>
-                            <div class="invalid-feedback">
-                                Password must be at least 8 characters long.
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="role" class="form-label fw-semibold">I am a...</label>
-                            <select class="form-select" id="role" name="role" required>
-                                <option value="">Select your role</option>
-                                <option value="victim">🆘 Disaster Victim (Need Help)</option>
-                                <option value="volunteer">🙋‍♂️ Volunteer (Provide Help)</option>
-                                <option value="ngo">🏢 NGO/Organization</option>
-                                <option value="coordinator">👩‍💼 Coordinator/Admin</option>
-                            </select>
-                            <div class="invalid-feedback">
-                                Please select your role.
-                            </div>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="terms" required>
-                                <label class="form-check-label text-muted" for="terms">
-                                    I agree to the <a href="#" class="text-decoration-none">Terms of Service</a> 
-                                    and <a href="#" class="text-decoration-none">Privacy Policy</a>
-                                </label>
-                                <div class="invalid-feedback">
-                                    You must agree to the terms and conditions.
-                                </div>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100 py-3 fw-semibold">
-                            <i class="bi bi-person-plus me-2"></i>Create Account
-                        </button>
-                    </form>
-
-                    <div class="text-center mt-4">
-                        <p class="text-muted mb-0">
-                            Already have an account? 
-                            <a href="{{ url_for('login') }}" class="text-decoration-none fw-semibold">Sign in here</a>
-                        </p>
-                    </div>
-                </div>
-            </div>
+<div class="container my-5">
+  <div class="row justify-content-center"><div class="col-md-6">
+    <div class="card shadow"><div class="card-body p-5">
+      <h2 class="text-center mb-4">Register</h2>
+      <form method="POST">
+        <div class="mb-3"><label class="form-label text-dark fw-bold">Name</label><input type="text" name="name" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label text-dark fw-bold">Email</label><input type="email" name="email" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label text-dark fw-bold">Phone</label><input type="tel" name="phone" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label text-dark fw-bold">Password</label><input type="password" name="password" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label text-dark fw-bold">Role</label>
+          <select name="role" class="form-select" required>
+            <option value="victim">Victim</option>
+            <option value="volunteer">Volunteer</option>
+            <option value="coordinator">Coordinator</option>
+          </select>
         </div>
-
-        <!-- Right Side - Information -->
-        <div class="col-lg-5 d-none d-lg-flex bg-gradient-primary">
-            <div class="d-flex align-items-center justify-content-center w-100 text-white p-5">
-                <div class="text-center">
-                    <div class="mb-4">
-                        <i class="bi bi-people-fill display-1 text-white"></i>
-                    </div>
-                    <h2 class="fw-bold mb-4">Join Our Community</h2>
-                    <p class="lead mb-4">Connect with thousands of volunteers, organizations, and coordinators making a real difference in disaster relief.</p>
-
-                    <div class="row mt-5">
-                        <div class="col-12 mb-4">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-check-circle-fill text-success me-3 fs-4"></i>
-                                <div class="text-start">
-                                    <h6 class="mb-0">Real-time Coordination</h6>
-                                    <small class="text-white-75">Connect instantly with those who need help</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 mb-4">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-shield-check-fill text-info me-3 fs-4"></i>
-                                <div class="text-start">
-                                    <h6 class="mb-0">Secure Platform</h6>
-                                    <small class="text-white-75">Your data is protected and encrypted</small>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="d-flex align-items-center">
-                                <i class="bi bi-heart-fill text-danger me-3 fs-4"></i>
-                                <div class="text-start">
-                                    <h6 class="mb-0">Make an Impact</h6>
-                                    <small class="text-white-75">Every action saves lives and builds resilience</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">Register</button>
+      </form>
+      <p class="text-center mt-3"><a href="{{ url_for('login') }}">Login</a></p>
+    </div></div>
+  </div></div>
 </div>
-
-<script>
-// Form validation
-(function() {
-    'use strict';
-    window.addEventListener('load', function() {
-        var forms = document.getElementsByClassName('needs-validation');
-        Array.prototype.filter.call(forms, function(form) {
-            form.addEventListener('submit', function(event) {
-                if (form.checkValidity() === false) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                form.classList.add('was-validated');
-            }, false);
-        });
-    }, false);
-})();
-</script>
 {% endblock %}
