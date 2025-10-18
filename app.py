@@ -41,7 +41,7 @@ def register():
                     'phone': request.form['phone'],
                     'role': request.form.get('role', 'victim'),
                     'location': request.form.get('location', ''),
-                    'active': True,  # KEPT - since it exists in your database
+                    'active': True,
                     'created_at': datetime.utcnow().isoformat(),
                     'last_seen': datetime.utcnow().isoformat(),
                     'password_hash': request.form['password']
@@ -84,7 +84,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-# ✅ UPDATED: Role-based dashboard
 @app.route('/dashboard')
 @login_required
 def dashboard():
@@ -92,14 +91,12 @@ def dashboard():
         user_role = session.get('role')
         user_id = session.get('user_id')
         
-        # Get all requests
         all_requests = databases.list_documents(
             database_id=Config.DATABASE_ID,
             collection_id='help_requests'
         )
         
         if user_role == 'victim':
-            # Victim: Show only their requests
             my_requests = databases.list_documents(
                 database_id=Config.DATABASE_ID,
                 collection_id='help_requests',
@@ -112,7 +109,6 @@ def dashboard():
                                  my_claimed=[])
         
         elif user_role == 'volunteer':
-            # Volunteer: Show pending tasks and their claimed tasks
             pending_requests = databases.list_documents(
                 database_id=Config.DATABASE_ID,
                 collection_id='help_requests',
@@ -132,7 +128,6 @@ def dashboard():
                                  my_requests=[])
         
         else:
-            # Coordinator: Show all requests
             pending_requests = databases.list_documents(
                 database_id=Config.DATABASE_ID,
                 collection_id='help_requests',
@@ -162,6 +157,25 @@ def dashboard():
 def create_request():
     if request.method == 'POST':
         try:
+            # ✅ GET AND VALIDATE COORDINATES
+            latitude = float(request.form['latitude'])
+            longitude = float(request.form['longitude'])
+            
+            # ✅ VALIDATE LATITUDE (-90 to 90)
+            if not (-90 <= latitude <= 90):
+                flash('❌ Invalid latitude! Must be between -90 and 90. Please select location on the map.', 'danger')
+                return redirect(url_for('create_request'))
+            
+            # ✅ VALIDATE LONGITUDE (-180 to 180)
+            if not (-180 <= longitude <= 180):
+                flash('❌ Invalid longitude! Must be between -180 and 180. Please select location on the map.', 'danger')
+                return redirect(url_for('create_request'))
+            
+            # ✅ ROUND TO 6 DECIMAL PLACES (prevents floating point issues)
+            latitude = round(latitude, 6)
+            longitude = round(longitude, 6)
+            
+            # Create help request with validated coordinates
             databases.create_document(
                 database_id=Config.DATABASE_ID,
                 collection_id='help_requests',
@@ -173,22 +187,27 @@ def create_request():
                     'description': request.form['description'],
                     'priority': request.form['priority'],
                     'location': request.form['location'],
-                    'latitude': float(request.form['latitude']),
-                    'longitude': float(request.form['longitude']),
+                    'latitude': latitude,
+                    'longitude': longitude,
                     'contact_phone': request.form['contact_phone'],
                     'status': 'pending',
                     'created_at': datetime.utcnow().isoformat(),
                     'updated_at': datetime.utcnow().isoformat()
                 }
             )
-            flash('Request submitted!', 'success')
+            
+            flash(f'✅ Request submitted successfully! Location: {latitude}, {longitude}', 'success')
             return redirect(url_for('dashboard'))
+            
+        except ValueError as e:
+            flash('❌ Invalid coordinates format! Please select a valid location on the map.', 'danger')
+            return redirect(url_for('create_request'))
         except Exception as e:
-            flash(str(e), 'danger')
+            flash(f'Error: {str(e)}', 'danger')
+            
     return render_template('create_request.html')
 
 
-# ✅ NEW: Claim task route
 @app.route('/task/claim/<request_id>')
 @login_required
 def claim_task(request_id):
@@ -217,7 +236,6 @@ def claim_task(request_id):
         return redirect(url_for('dashboard'))
 
 
-# ✅ NEW: Complete task route
 @app.route('/task/complete/<request_id>')
 @login_required
 def complete_task(request_id):
@@ -244,7 +262,6 @@ def complete_task(request_id):
         return redirect(url_for('dashboard'))
 
 
-# ✅ NEW: Available tasks route
 @app.route('/tasks/available')
 @login_required
 def available_tasks():
@@ -260,6 +277,31 @@ def available_tasks():
         )
         
         return render_template('available_tasks.html', tasks=pending['documents'])
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'danger')
+        return redirect(url_for('dashboard'))
+
+
+@app.route('/navigate/<request_id>')
+@login_required
+def navigate_to_victim(request_id):
+    try:
+        if session.get('role') != 'volunteer':
+            flash('Only volunteers can access navigation', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        request_doc = databases.get_document(
+            database_id=Config.DATABASE_ID,
+            collection_id='help_requests',
+            document_id=request_id
+        )
+        
+        if request_doc.get('volunteer_id') != session.get('user_id'):
+            flash('You can only navigate to tasks you claimed', 'danger')
+            return redirect(url_for('dashboard'))
+        
+        return render_template('navigate_to_victim.html', request=request_doc)
+    
     except Exception as e:
         flash(f'Error: {str(e)}', 'danger')
         return redirect(url_for('dashboard'))
@@ -287,33 +329,6 @@ def get_requests():
         return jsonify(reqs)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
-    
-@app.route('/navigate/<request_id>')
-@login_required
-def navigate_to_victim(request_id):
-    try:
-        if session.get('role') != 'volunteer':
-            flash('Only volunteers can access navigation', 'danger')
-            return redirect(url_for('dashboard'))
-        
-        # Get the help request details
-        request_doc = databases.get_document(
-            database_id=Config.DATABASE_ID,
-            collection_id='help_requests',
-            document_id=request_id
-        )
-        
-        # Verify this volunteer claimed this task
-        if request_doc['volunteer_id'] != session.get('user_id'):
-            flash('You can only navigate to tasks you claimed', 'danger')
-            return redirect(url_for('dashboard'))
-        
-        return render_template('navigate_to_victim.html', request=request_doc)
-    
-    except Exception as e:
-        flash(f'Error: {str(e)}', 'danger')
-        return redirect(url_for('dashboard'))
 
 
 if __name__ == '__main__':

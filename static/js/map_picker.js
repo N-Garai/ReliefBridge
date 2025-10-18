@@ -1,39 +1,71 @@
-// static/js/map_picker.js - Interactive Map Location Picker
+// static/js/map_picker.js - Interactive Map Location Picker (WITH VALIDATION)
 
 let map;
 let marker;
 let locationSelected = false;
 
-// Initialize map on page load
 document.addEventListener('DOMContentLoaded', function() {
     initMap();
 });
 
-// Initialize the map
 function initMap() {
-    // Default center (you can change this to your city)
-    const defaultCenter = [37.7749, -122.4194]; // San Francisco
+    // Default center - India
+    const defaultCenter = [22.5726, 88.3639]; // Kolkata, India
     
     // Create map
-    map = L.map('locationMap').setView(defaultCenter, 13);
+    map = L.map('locationMap').setView(defaultCenter, 6);
     
-    // Add tile layer (map background)
+    // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 19
     }).addTo(map);
     
     // Click event on map
     map.on('click', function(e) {
-        setLocation(e.latlng.lat, e.latlng.lng);
+        const lat = e.latlng.lat;
+        const lng = e.latlng.lng;
+        
+        // ✅ VALIDATE COORDINATES
+        if (validateCoordinates(lat, lng)) {
+            setLocation(lat, lng);
+        } else {
+            alert('⚠️ Invalid coordinates! Please select a location within valid range.\nLatitude: -90 to 90\nLongitude: -180 to 180');
+        }
     });
     
-    // Show info message
+    // Show instruction
     showMapInstruction();
 }
 
-// Set location on map
+// ✅ NEW: Validate coordinates
+function validateCoordinates(lat, lng) {
+    // Check if coordinates are valid
+    if (isNaN(lat) || isNaN(lng)) {
+        console.error('Coordinates are not numbers:', lat, lng);
+        return false;
+    }
+    
+    // Latitude must be between -90 and 90
+    if (lat < -90 || lat > 90) {
+        console.error('Invalid latitude:', lat);
+        return false;
+    }
+    
+    // Longitude must be between -180 and 180
+    if (lng < -180 || lng > 180) {
+        console.error('Invalid longitude:', lng);
+        return false;
+    }
+    
+    return true;
+}
+
 function setLocation(lat, lng) {
+    // ✅ ROUND TO 6 DECIMAL PLACES (prevents floating point issues)
+    lat = parseFloat(lat.toFixed(6));
+    lng = parseFloat(lng.toFixed(6));
+    
     // Remove existing marker
     if (marker) {
         map.removeLayer(marker);
@@ -52,50 +84,74 @@ function setLocation(lat, lng) {
         })
     }).addTo(map);
     
-    // Update coordinates
+    // Update hidden form fields
     document.getElementById('latitude').value = lat;
     document.getElementById('longitude').value = lng;
     
-    // Reverse geocode to get address
+    // Get address
     reverseGeocode(lat, lng);
     
-    // Enable drag on marker
+    // Handle marker drag
     marker.on('dragend', function(e) {
         const newPos = e.target.getLatLng();
-        setLocation(newPos.lat, newPos.lng);
+        if (validateCoordinates(newPos.lat, newPos.lng)) {
+            setLocation(newPos.lat, newPos.lng);
+        } else {
+            alert('⚠️ Invalid location! Marker moved back.');
+            marker.setLatLng([lat, lng]);
+        }
     });
     
     // Enable submit button
     locationSelected = true;
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').nextElementSibling.textContent = 'Location selected! You can now submit.';
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+        const statusText = submitBtn.nextElementSibling;
+        if (statusText) {
+            statusText.textContent = '✅ Location selected! You can now submit.';
+            statusText.className = 'text-success text-center mt-2';
+        }
+    }
     
     // Center map on marker
     map.setView([lat, lng], 15);
+    
+    // Show coordinates in popup
+    marker.bindPopup(`<strong>Selected Location</strong><br>Lat: ${lat}<br>Lng: ${lng}`).openPopup();
 }
 
-// Get user's current location
 function getMyLocation() {
     const btn = event.target;
     const originalText = btn.innerHTML;
     
-    btn.innerHTML = '<i class="spinner-border spinner-border-sm me-2"></i>Getting Location...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Getting Location...';
     btn.disabled = true;
     
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
             function(position) {
-                setLocation(position.coords.latitude, position.coords.longitude);
-                btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Location Obtained';
-                btn.classList.remove('btn-info');
-                btn.classList.add('btn-success');
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
                 
-                setTimeout(() => {
+                // ✅ VALIDATE before setting
+                if (validateCoordinates(lat, lng)) {
+                    setLocation(lat, lng);
+                    btn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Location Obtained';
+                    btn.classList.remove('btn-info');
+                    btn.classList.add('btn-success');
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-info');
+                        btn.disabled = false;
+                    }, 2000);
+                } else {
+                    alert('⚠️ Your GPS location is invalid! Please select manually on the map.');
                     btn.innerHTML = originalText;
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-info');
                     btn.disabled = false;
-                }, 2000);
+                }
             },
             function(error) {
                 alert('Error getting location: ' + error.message + '\nPlease click on the map to set your location manually.');
@@ -109,24 +165,31 @@ function getMyLocation() {
             }
         );
     } else {
-        alert('Geolocation is not supported by your browser. Please click on the map to set your location.');
+        alert('Geolocation not supported. Please click on the map.');
         btn.innerHTML = originalText;
         btn.disabled = false;
     }
 }
 
-// Search for an address
 function searchAddress() {
     const address = prompt('Enter your address or location:');
     
-    if (address) {
-        // Use Nominatim geocoding service
+    if (address && address.trim()) {
+        // Use Nominatim geocoding
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
             .then(response => response.json())
             .then(data => {
                 if (data && data.length > 0) {
                     const result = data[0];
-                    setLocation(parseFloat(result.lat), parseFloat(result.lon));
+                    const lat = parseFloat(result.lat);
+                    const lng = parseFloat(result.lon);
+                    
+                    // ✅ VALIDATE before setting
+                    if (validateCoordinates(lat, lng)) {
+                        setLocation(lat, lng);
+                    } else {
+                        alert('⚠️ Found address has invalid coordinates! Please try another search or select on map.');
+                    }
                 } else {
                     alert('Address not found. Please try again or click on the map.');
                 }
@@ -138,7 +201,6 @@ function searchAddress() {
     }
 }
 
-// Reverse geocode coordinates to address
 function reverseGeocode(lat, lng) {
     fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
         .then(response => response.json())
@@ -146,16 +208,15 @@ function reverseGeocode(lat, lng) {
             if (data.display_name) {
                 document.getElementById('location').value = data.display_name;
             } else {
-                document.getElementById('location').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+                document.getElementById('location').value = `Lat: ${lat}, Lng: ${lng}`;
             }
         })
         .catch(error => {
-            document.getElementById('location').value = `Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`;
+            document.getElementById('location').value = `Lat: ${lat}, Lng: ${lng}`;
             console.error('Reverse geocoding error:', error);
         });
 }
 
-// Show instruction popup
 function showMapInstruction() {
     const popup = L.popup()
         .setLatLng(map.getCenter())
@@ -167,11 +228,21 @@ function showMapInstruction() {
     }, 3000);
 }
 
-// Form validation
-document.getElementById('requestForm').addEventListener('submit', function(e) {
-    if (!locationSelected) {
-        e.preventDefault();
-        alert('Please select your location on the map first!');
-        return false;
+// ✅ NEW: Form validation before submit
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('requestForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const lat = parseFloat(document.getElementById('latitude').value);
+            const lng = parseFloat(document.getElementById('longitude').value);
+            
+            if (!locationSelected || !validateCoordinates(lat, lng)) {
+                e.preventDefault();
+                alert('⚠️ Please select a valid location on the map first!\n\nMake sure:\n- You clicked on the map\n- The red marker is visible\n- Coordinates are valid');
+                return false;
+            }
+            
+            return true;
+        });
     }
 });

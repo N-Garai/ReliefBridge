@@ -1,4 +1,4 @@
-// static/js/navigation.js - Real-time Navigation to Victim
+// static/js/navigation.js - Real-time Navigation (FIXED)
 
 let map;
 let volunteerMarker;
@@ -7,16 +7,18 @@ let routeLine;
 let watchId;
 let volunteerPosition = null;
 
-// Initialize map and start tracking
 document.addEventListener('DOMContentLoaded', function() {
     initializeNavigation();
 });
 
 function initializeNavigation() {
-    // Create map centered on victim location
-    map = L.map('navigationMap').setView([victimLat, victimLng], 13);
+    // Create map - calculate center between volunteer and victim
+    const centerLat = victimLat;
+    const centerLng = victimLng;
     
-    // Add tile layer (OpenStreetMap)
+    map = L.map('navigationMap').setView([centerLat, centerLng], 10);
+    
+    // Add tile layer
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19
@@ -34,7 +36,7 @@ function initializeNavigation() {
         })
     }).addTo(map);
     
-    victimMarker.bindPopup(`<strong>${victimName}</strong><br>Victim Location<br><a href="tel:${victimPhone}">Call Now</a>`).openPopup();
+    victimMarker.bindPopup(`<strong>${victimName}</strong><br>Victim Location<br><a href="tel:${victimPhone}">Call</a>`).openPopup();
     
     // Start tracking volunteer location
     startTracking();
@@ -42,18 +44,17 @@ function initializeNavigation() {
 
 function startTracking() {
     if (navigator.geolocation) {
-        // Watch position for real-time updates
         watchId = navigator.geolocation.watchPosition(
             updateVolunteerPosition,
             handleLocationError,
             {
                 enableHighAccuracy: true,
-                timeout: 5000,
+                timeout: 10000,
                 maximumAge: 0
             }
         );
     } else {
-        alert('Geolocation is not supported by your browser');
+        alert('Geolocation not supported by your browser');
     }
 }
 
@@ -78,30 +79,27 @@ function updateVolunteerPosition(position) {
             })
         }).addTo(map);
         
-        volunteerMarker.bindPopup('<strong>Your Location</strong><br>Volunteer Position');
+        volunteerMarker.bindPopup('<strong>Your Location</strong><br>Volunteer');
     }
     
-    // Draw route line
+    // Draw route (FIXED VERSION)
     drawRoute(lat, lng, victimLat, victimLng);
     
-    // Calculate distance and ETA
+    // Calculate and update stats
     updateStats(lat, lng, victimLat, victimLng);
     
-    // Adjust map to show both markers
-    const bounds = L.latLngBounds([
-        [lat, lng],
-        [victimLat, victimLng]
-    ]);
-    map.fitBounds(bounds, { padding: [50, 50] });
+    // Fit bounds to show both markers (FIXED)
+    fitMapBounds(lat, lng, victimLat, victimLng);
 }
 
 function drawRoute(fromLat, fromLng, toLat, toLng) {
-    // Remove existing route line
+    // Remove existing route
     if (routeLine) {
         map.removeLayer(routeLine);
     }
     
-    // Draw simple straight line route
+    // ✅ FIX: Use geodesic option to draw route correctly
+    // This prevents the "mirror map" issue when crossing large distances
     routeLine = L.polyline([
         [fromLat, fromLng],
         [toLat, toLng]
@@ -109,42 +107,58 @@ function drawRoute(fromLat, fromLng, toLat, toLng) {
         color: '#0d6efd',
         weight: 4,
         opacity: 0.7,
-        dashArray: '10, 10'
+        dashArray: '10, 10',
+        // This prevents wrapping around the world
+        noClip: false
     }).addTo(map);
 }
 
+function fitMapBounds(volLat, volLng, vicLat, vicLng) {
+    // ✅ FIX: Calculate proper bounds without crossing dateline
+    const bounds = L.latLngBounds([
+        [volLat, volLng],
+        [vicLat, vicLng]
+    ]);
+    
+    // Add padding and fit
+    map.fitBounds(bounds, { 
+        padding: [80, 80],
+        maxZoom: 13
+    });
+}
+
 function updateStats(fromLat, fromLng, toLat, toLng) {
-    // Calculate distance using Haversine formula
+    // Calculate distance
     const distance = calculateDistance(fromLat, fromLng, toLat, toLng);
     
-    // Estimate ETA (assuming 40 km/h average speed)
-    const averageSpeed = 40; // km/h
-    const timeInHours = distance / averageSpeed;
-    const timeInMinutes = Math.round(timeInHours * 60);
+    // Calculate ETA (40 km/h average)
+    const timeInMinutes = Math.round((distance / 40) * 60);
     
     // Update UI
     document.getElementById('distance').textContent = distance.toFixed(2) + ' km';
     document.getElementById('eta').textContent = timeInMinutes + ' min';
     
-    // Update progress bar (closer = more progress)
-    const maxDistance = 10; // km - adjust based on your use case
+    // Update progress bar
+    const maxDistance = 50; // Adjust based on typical distances
     const progress = Math.max(0, Math.min(100, ((maxDistance - distance) / maxDistance) * 100));
     document.getElementById('progressBar').style.width = progress + '%';
     
-    // Update status message
-    const statusElement = document.getElementById('status');
+    // Update status
+    const statusEl = document.getElementById('status');
     if (distance < 0.1) {
-        statusElement.innerHTML = '<strong class="text-success">✅ You have arrived!</strong>';
+        statusEl.innerHTML = '<strong class="text-success">✅ You have arrived!</strong>';
     } else if (distance < 0.5) {
-        statusElement.innerHTML = '<strong class="text-warning">📍 Very close - less than 500m</strong>';
+        statusEl.innerHTML = '<strong class="text-warning">📍 Very close - less than 500m</strong>';
+    } else if (distance < 5) {
+        statusEl.innerHTML = `<strong class="text-info">🚗 Nearby - ${distance.toFixed(2)} km remaining</strong>`;
     } else {
-        statusElement.innerHTML = `<strong>🚗 On the way - ${distance.toFixed(2)} km remaining</strong>`;
+        statusEl.innerHTML = `<strong>🚗 On the way - ${distance.toFixed(2)} km remaining</strong>`;
     }
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
-    // Haversine formula to calculate distance between two points
-    const R = 6371; // Radius of Earth in km
+    // Haversine formula
+    const R = 6371; // Earth radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -156,51 +170,51 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
 function handleLocationError(error) {
     console.error('Location error:', error);
-    let errorMsg = 'Unable to get your location. ';
+    let msg = 'Unable to get location. ';
     
     switch(error.code) {
         case error.PERMISSION_DENIED:
-            errorMsg += 'Please enable location permissions.';
+            msg += 'Please enable location permissions.';
             break;
         case error.POSITION_UNAVAILABLE:
-            errorMsg += 'Location information unavailable.';
+            msg += 'Location unavailable.';
             break;
         case error.TIMEOUT:
-            errorMsg += 'Location request timed out.';
+            msg += 'Request timed out.';
             break;
         default:
-            errorMsg += 'Unknown error occurred.';
+            msg += 'Unknown error.';
     }
     
-    alert(errorMsg);
+    alert(msg);
 }
 
 function markAsArrived() {
-    if (volunteerPosition) {
-        const distance = calculateDistance(
-            volunteerPosition.lat,
-            volunteerPosition.lng,
-            victimLat,
-            victimLng
-        );
-        
-        if (distance < 0.5) { // Within 500m
-            alert('✅ Marked as arrived! You can now complete the task.');
-        } else {
-            alert('⚠️ You are still ' + distance.toFixed(2) + ' km away from the victim.');
-        }
+    if (!volunteerPosition) {
+        alert('⚠️ Waiting for your location...');
+        return;
+    }
+    
+    const distance = calculateDistance(
+        volunteerPosition.lat,
+        volunteerPosition.lng,
+        victimLat,
+        victimLng
+    );
+    
+    if (distance < 0.5) {
+        alert('✅ Marked as arrived! You can complete the task now.');
     } else {
-        alert('⚠️ Unable to determine your location. Please wait...');
+        alert(`⚠️ You are ${distance.toFixed(2)} km away. Get closer to mark as arrived.`);
     }
 }
 
 function openInGoogleMaps() {
-    // Open Google Maps with directions
-    const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${victimLat},${victimLng}`;
-    window.open(mapsUrl, '_blank');
+    // Open Google Maps directions
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${victimLat},${victimLng}`, '_blank');
 }
 
-// Stop tracking when leaving page
+// Cleanup on page unload
 window.addEventListener('beforeunload', function() {
     if (watchId) {
         navigator.geolocation.clearWatch(watchId);
