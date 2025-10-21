@@ -86,13 +86,23 @@
     </div>
 </div>
 
+<script type="application/json" id="victimData">
+{
+    "latitude": {{ request.latitude }},
+    "longitude": {{ request.longitude }},
+    "name": "{{ request.user_name }}",
+    "phone": "{{ request.contact_phone }}",
+    "address": "{{ request.location }}"
+}
+</script>
 <script>
-// Victim's location from backend
-const victimLat = {{ request.latitude }};
-const victimLng = {{ request.longitude }};
-const victimName = "{{ request.user_name }}";
-const victimPhone = "{{ request.contact_phone }}";
-const victimAddress = "{{ request.location }}";
+// Parse victim data from JSON
+const victimData = JSON.parse(document.getElementById('victimData').textContent);
+const victimLat = victimData.latitude;
+const victimLng = victimData.longitude;
+const victimName = victimData.name;
+const victimPhone = victimData.phone;
+const victimAddress = victimData.address;
 </script>
 <script src="{{ url_for('static', filename='js/navigation.js') }}"></script>
 {% endblock %}
