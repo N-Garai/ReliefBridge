@@ -407,23 +407,7 @@ ReliefBridge/
 
 ---
 
-## 📸 Screenshots
-
-### Landing Page
-*Coming soon - Add screenshots of your application*
-
-### Live Map View
-*Interactive map showing all emergency requests with color-coded priorities*
-
-### Volunteer Dashboard
-*Claim and manage tasks efficiently*
-
-### Request Creation
-*Easy-to-use form with map-based location picker*
-
----
-
-## 🗺️ Roadmap
+## ️ Roadmap
 
 ### Phase 1: Core Features ✅
 - [x] User authentication system
