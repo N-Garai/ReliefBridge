@@ -1,0 +1,11 @@
+# Appwrite Build Configuration
+projectId: 68f0dbb6003952b7e1c7
+endpoint: https://cloud.appwrite.io/v1
+database: reliefbridge_db
+collections:
+  - users
+  - help_requests
+platforms:
+  web:
+    name: ReliefBridge Web
+    hostName: reliefbridge.appwrite.app
