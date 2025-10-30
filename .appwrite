@@ -2,10 +2,21 @@
 projectId: 68f0dbb6003952b7e1c7
 endpoint: https://cloud.appwrite.io/v1
 database: reliefbridge_db
+hosting:
+  root: public
+  index: index.html
+  cleanUrls: true
 collections:
   - users
   - help_requests
+functions:
+  - name: auth
+    runtime: node-16.0
+    path: functions/auth
+    events:
+      - http
+    schedule: ""
 platforms:
   web:
     name: ReliefBridge Web
-    hostName: reliefbridge.appwrite.app
+    hostName: reliefbridge.appwrite.network
