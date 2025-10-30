@@ -1,0 +1,9 @@
+{
+  "name": "requests",
+  "version": "1.0.0",
+  "description": "Request management functions for ReliefBridge",
+  "main": "src/index.js",
+  "dependencies": {
+    "node-appwrite": "^9.0.0"
+  }
+}

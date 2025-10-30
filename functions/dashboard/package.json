@@ -1,0 +1,9 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard function for ReliefBridge",
+  "main": "src/index.js",
+  "dependencies": {
+    "node-appwrite": "^9.0.0"
+  }
+}
