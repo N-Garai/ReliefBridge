@@ -1,0 +1,23 @@
+app:
+  name: reliefbridge
+  platform: web
+  hostname: reliefbridge.appwrite.io
+
+deploy:
+  - name: build
+    command: npm run build
+    path: build/
+    include:
+      - "*.html"
+      - "css/*"
+      - "js/*"
+      - "static/*"
+
+services:
+  - type: web
+    name: web
+    env:
+      - name: APPWRITE_ENDPOINT
+        value: https://cloud.appwrite.io/v1
+      - name: APPWRITE_PROJECT_ID
+        value: 68f0dbb6003952b7e1c7
