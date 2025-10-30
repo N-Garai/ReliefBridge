@@ -1,0 +1,17 @@
+{
+    "projectId": "68f0dbb6003952b7e1c7",
+    "projectName": "ReliefBridge",
+    "databases": [{
+        "id": "reliefbridge_db",
+        "name": "ReliefBridge Database",
+        "collections": [
+            "users",
+            "help_requests"
+        ]
+    }],
+    "platforms": [{
+        "type": "web",
+        "name": "ReliefBridge Web",
+        "hostname": "web-production-ec9bd.up.railway.app"
+    }]
+}
