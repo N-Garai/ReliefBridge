@@ -1,17 +1,60 @@
 {
     "projectId": "68f0dbb6003952b7e1c7",
     "projectName": "ReliefBridge",
-    "databases": [{
-        "id": "reliefbridge_db",
-        "name": "ReliefBridge Database",
-        "collections": [
-            "users",
-            "help_requests"
-        ]
-    }],
-    "platforms": [{
-        "type": "web",
-        "name": "ReliefBridge Web",
-        "hostname": "web-production-ec9bd.up.railway.app"
-    }]
+    "functions": [
+        {
+            "name": "auth",
+            "runtime": "node-16.0",
+            "path": "functions/auth",
+            "entrypoint": "src/index.js",
+            "execute": [
+                "any"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "name": "dashboard",
+            "runtime": "node-16.0",
+            "path": "functions/dashboard",
+            "entrypoint": "src/index.js",
+            "execute": [
+                "users"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "name": "requests",
+            "runtime": "node-16.0",
+            "path": "functions/requests",
+            "entrypoint": "src/index.js",
+            "execute": [
+                "users"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        },
+        {
+            "name": "tasks",
+            "runtime": "node-16.0",
+            "path": "functions/tasks",
+            "entrypoint": "src/index.js",
+            "execute": [
+                "users"
+            ],
+            "events": [],
+            "schedule": "",
+            "timeout": 15
+        }
+    ],
+    "hosting": [
+        {
+            "path": "public",
+            "entrypoint": "index.html"
+        }
+    ]
 }
