@@ -1,0 +1,12 @@
+{
+  "name": "reliefbridge",
+  "version": "1.0.0",
+  "description": "ReliefBridge - Emergency Response Platform",
+  "main": "index.js",
+  "scripts": {
+    "build": "echo 'No build needed - static site'"
+  },
+  "dependencies": {
+    "node-appwrite": "^13.0.0"
+  }
+}
