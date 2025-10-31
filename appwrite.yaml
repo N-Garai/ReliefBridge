@@ -1,27 +1,29 @@
 app:
   name: reliefbridge
-  platform: static
+  platform: web
+
+build:
+  commands:
+    - npm ci
+    - mkdir -p dist
+    - cp -r build/* dist/
+  output: dist
 
 deploy:
-  root: build
-  include:
-    - "*.html"
-    - "css/**/*"
-    - "js/**/*"
-    - "static/**/*"
-  exclude:
-    - "node_modules/**"
-    - ".env"
-    - "*.py"
-    - "__pycache__/**"
-    - "*.pyc"
+  - name: web
+    path: dist
+    command: echo "Static site deployment - no build needed"
 
 static:
-  directory: build
+  dir: dist
   index: index.html
 
-environment_variables:
+env:
   - name: APPWRITE_ENDPOINT
     value: https://cloud.appwrite.io/v1
   - name: APPWRITE_PROJECT_ID
     value: 68f0dbb6003952b7e1c7
+
+runtime:
+  name: node
+  version: 16

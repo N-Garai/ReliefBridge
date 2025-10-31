@@ -1,0 +1,2 @@
+# No Python dependencies needed for static deployment
+# This file exists to satisfy the deployment process
