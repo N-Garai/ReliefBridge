@@ -1,27 +1,27 @@
 app:
   name: reliefbridge
-  platform: web
-  hostname: reliefbridge.appwrite.io
+  platform: static
 
 deploy:
-  - name: web
-    path: ./
-    include:
-      - "static/**/*"
-      - "templates/**/*"
-    exclude:
-      - "**/__pycache__/**"
-      - "**/*.pyc"
-      - "**/*.log"
-      - "node_modules/**"
-      - ".env"
-      - "*.py"
+  root: build
+  include:
+    - "*.html"
+    - "css/**/*"
+    - "js/**/*"
+    - "static/**/*"
+  exclude:
+    - "node_modules/**"
+    - ".env"
+    - "*.py"
+    - "__pycache__/**"
+    - "*.pyc"
 
-services:
-  - type: web
-    name: web
-    env:
-      - name: APPWRITE_ENDPOINT
-        value: https://cloud.appwrite.io/v1
-      - name: APPWRITE_PROJECT_ID
-        value: 68f0dbb6003952b7e1c7
+static:
+  directory: build
+  index: index.html
+
+environment_variables:
+  - name: APPWRITE_ENDPOINT
+    value: https://cloud.appwrite.io/v1
+  - name: APPWRITE_PROJECT_ID
+    value: 68f0dbb6003952b7e1c7
