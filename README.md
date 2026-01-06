@@ -6,7 +6,7 @@
 
 *Connecting victims and volunteers during disasters through real-time technology*
 
-[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://web-production-ec9bd.up.railway.app/) 
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://youtu.be/OfvoeamibKY) 
 [![Built with Appwrite](https://img.shields.io/badge/Built%20with-Appwrite-f02e65?logo=appwrite)](https://appwrite.io)
 [![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask)](https://flask.palletsprojects.com/)
