@@ -12,7 +12,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask)](https://flask.palletsprojects.com/)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-[Live Demo](https://web-production-ec9bd.up.railway.app/) • [Report Bug](https://github.com/N-Garai/ReliefBridge/issues) • [Request Feature](https://github.com/N-Garai/ReliefBridge/issues)
+[Live Demo](https://youtu.be/OfvoeamibKY) • [Report Bug](https://github.com/N-Garai/ReliefBridge/issues) • [Request Feature](https://github.com/N-Garai/ReliefBridge/issues)
      
      unfortuantly hosting is not available right now
 </div>
